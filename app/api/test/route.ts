@@ -1,9 +1,7 @@
-import clientPromise from "@/lib/mongodb";
+import { getDb } from "@/lib/mongodb";
 
 export async function GET() {
-  const client = await clientPromise;
-
-  const db = client.db("social-network");
+  const db = await getDb();
 
   const result = await db.command({ ping: 1 });
 
