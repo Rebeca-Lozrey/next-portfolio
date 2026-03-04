@@ -8,6 +8,12 @@ const eslintConfig = defineConfig([
   ...nextTs,
   prettier, // disables ESLint formatting rules
   // Override default ignores of eslint-config-next.
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
