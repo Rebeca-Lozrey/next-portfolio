@@ -1,8 +1,8 @@
-export default function Home() {
+export default function LoginPage() {
   return (
     <main className="page">
       <section className="hero">
-        <h1>About this website</h1>
+        <h1>Login</h1>
 
         <p>Discover features with next speed.</p>
       </section>
