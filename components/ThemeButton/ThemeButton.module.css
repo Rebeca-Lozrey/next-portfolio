@@ -1,0 +1,21 @@
+.themeButton {
+  position: relative;
+}
+
+.sunIcon {
+  position: absolute;
+  display: none;
+}
+
+.moonIcon {
+  position: absolute;
+  display: block;
+}
+
+:global(html.dark) .sunIcon {
+  display: block;
+}
+
+:global(html.dark) .moonIcon {
+  display: none;
+}

@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
 import { Geist, Geist_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import UserMenu from "@/components/UserMenu";
+
 import { Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
+
+import ThemeButton from "@/components/ThemeButton";
+import UserMenu from "@/components/UserMenu";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,28 +33,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <Theme>
-          <header className="topbar">
-            <div className="topbar-inner">
-              <Link href="/">
-                <Image
-                  src="/logo.svg"
-                  alt="social logo"
-                  width={72}
-                  height={18}
-                  priority
-                />
-              </Link>
-              <nav className="topbar-menu">
-                <UserMenu />
-              </nav>
-            </div>
-          </header>
+        <ThemeProvider attribute="class">
+          <Theme>
+            <header className="topbar">
+              <div className="topbar-inner">
+                <Link href="/">
+                  <Image
+                    src="/logo.svg"
+                    alt="social logo"
+                    width={72}
+                    height={18}
+                    priority
+                  />
+                </Link>
 
-          <main className="site-content">{children}</main>
-        </Theme>
+                <nav className="topbar-menu">
+                  <ThemeButton />
+                  <UserMenu />
+                </nav>
+              </div>
+            </header>
+
+            <main className="site-content">{children}</main>
+          </Theme>
+        </ThemeProvider>
       </body>
     </html>
   );

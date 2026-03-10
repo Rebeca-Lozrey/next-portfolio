@@ -1,13 +1,16 @@
-import { DropdownMenu, Button, Avatar } from "@radix-ui/themes";
+"use client";
 import Link from "next/link";
+
+import { PersonIcon } from "@radix-ui/react-icons";
+import { DropdownMenu, IconButton } from "@radix-ui/themes";
 
 export default function UserMenu() {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <Button variant="ghost">
-          <Avatar fallback="U" radius="full" size="2" />
-        </Button>
+        <IconButton color="gray" variant="outline" highContrast>
+          <PersonIcon />
+        </IconButton>
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content align="end">
