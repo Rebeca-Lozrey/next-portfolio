@@ -1,0 +1,9 @@
+.imageUploadButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.previewImage {
+  border-radius: var(--radius-2);
+}

@@ -1,11 +1,18 @@
+import ArticleForm from "@/components/ArticleForm/ArticleForm";
+
 export default function Home() {
   return (
-    <main className="page">
-      <section className="hero">
-        <h1>About this website</h1>
+    <>
+      <div className="thread">
+        <section>
+          <ArticleForm />
+        </section>
+        <section>
+          <h1>About this website</h1>
 
-        <p>Discover features with next speed.</p>
-      </section>
-    </main>
+          <p>Discover features with next speed.</p>
+        </section>
+      </div>
+    </>
   );
 }

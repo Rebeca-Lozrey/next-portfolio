@@ -6,3 +6,8 @@ export interface Article {
   likeCount: number;
   createdAt: Date;
 }
+
+export interface CreateArticleRequest {
+  content: string;
+  imageUrl?: string | null;
+}

@@ -9,6 +9,7 @@ import "@radix-ui/themes/styles.css";
 
 import ThemeButton from "@/components/ThemeButton";
 import UserMenu from "@/components/UserMenu";
+import QueryProvider from "@/providers/QueryProvider";
 
 import "./globals.css";
 
@@ -37,26 +38,31 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ThemeProvider attribute="class">
           <Theme>
-            <header className="topbar">
-              <div className="topbar-inner">
-                <Link href="/">
-                  <Image
-                    src="/logo.svg"
-                    alt="social logo"
-                    width={72}
-                    height={18}
-                    priority
-                  />
-                </Link>
+            <QueryProvider>
+              <header className="topbar">
+                <div className="topbar-inner">
+                  <Link href="/">
+                    <Image
+                      src="/logo.svg"
+                      alt="social logo"
+                      width={72}
+                      height={18}
+                      priority
+                    />
+                  </Link>
 
-                <nav className="topbar-menu">
-                  <ThemeButton />
-                  <UserMenu />
-                </nav>
+                  <nav className="topbar-menu">
+                    <ThemeButton />
+                    <UserMenu />
+                  </nav>
+                </div>
+              </header>
+              <div className="layout">
+                <aside className="sidebar-left"></aside>
+                <main className="site-content">{children}</main>
+                <aside className="sidebar-right"></aside>
               </div>
-            </header>
-
-            <main className="site-content">{children}</main>
+            </QueryProvider>
           </Theme>
         </ThemeProvider>
       </body>
