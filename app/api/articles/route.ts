@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const article: Article = {
+    const article: Omit<Article, "id"> = {
       authorId: "user.id",
       authorUsername: "user.username",
       content,
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const insertedId = await mongoArticlesRepository.insert(article);
 
     return NextResponse.json({
-      success: true,
+      ...article,
       id: insertedId,
     });
   } catch (error) {
@@ -36,6 +36,23 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { error: "Failed to create article" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const cursor = searchParams.get("cursor") ?? undefined;
+
+    const page = await mongoArticlesRepository.infiniteByCursor(cursor);
+    return NextResponse.json(page);
+  } catch (error) {
+    console.error("Fetch articles error:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch articles" },
       { status: 500 },
     );
   }

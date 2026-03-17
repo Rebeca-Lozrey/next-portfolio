@@ -22,3 +22,7 @@
   display: flex;
   justify-content: space-between;
 }
+
+.textarea :global(.rt-TextAreaInput) {
+  font-size: inherit;
+}

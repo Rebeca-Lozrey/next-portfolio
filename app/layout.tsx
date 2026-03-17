@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { Theme } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import ThemeButton from "@/components/ThemeButton";
 import UserMenu from "@/components/UserMenu";
@@ -62,6 +63,7 @@ export default function RootLayout({
                 <main className="site-content">{children}</main>
                 <aside className="sidebar-right"></aside>
               </div>
+              <ReactQueryDevtools initialIsOpen={false} />
             </QueryProvider>
           </Theme>
         </ThemeProvider>

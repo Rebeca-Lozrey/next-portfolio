@@ -1,4 +1,5 @@
 import ArticleForm from "@/components/ArticleForm/ArticleForm";
+import ArticlesList from "@/components/ArticlesList/ArticlesList";
 
 export default function Home() {
   return (
@@ -8,9 +9,7 @@ export default function Home() {
           <ArticleForm />
         </section>
         <section>
-          <h1>About this website</h1>
-
-          <p>Discover features with next speed.</p>
+          <ArticlesList />
         </section>
       </div>
     </>

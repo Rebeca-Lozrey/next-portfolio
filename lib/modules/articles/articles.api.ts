@@ -1,4 +1,7 @@
-import type { CreateArticleRequest } from "@/lib/modules/articles/articles.types";
+import type {
+  ArticlesPage,
+  CreateArticleRequest,
+} from "@/lib/modules/articles/articles.types";
 
 export async function createArticle(payload: CreateArticleRequest) {
   const res = await fetch("/api/articles", {
@@ -11,6 +14,16 @@ export async function createArticle(payload: CreateArticleRequest) {
 
   if (!res.ok) {
     throw new Error("Failed to create article");
+  }
+
+  return res.json();
+}
+
+export async function getArticles(cursor?: string): Promise<ArticlesPage> {
+  const res = await fetch(`/api/articles?cursor=${cursor ?? ""}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch articles");
   }
 
   return res.json();

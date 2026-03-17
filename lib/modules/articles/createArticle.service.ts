@@ -12,7 +12,7 @@ export async function createArticle(
   repo: ArticlesRepository,
   input: CreateArticleInput,
 ): Promise<string> {
-  const article: Article = {
+  const article: Omit<Article, "id"> = {
     authorId: input.authorId,
     authorUsername: input.authorUsername,
     content: input.content,
