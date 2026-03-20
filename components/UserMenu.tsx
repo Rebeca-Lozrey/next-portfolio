@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 import { PersonIcon } from "@radix-ui/react-icons";
-import { DropdownMenu, IconButton } from "@radix-ui/themes";
+import { DropdownMenu, IconButton, Text } from "@radix-ui/themes";
 
 export default function UserMenu() {
   return (
@@ -15,6 +15,9 @@ export default function UserMenu() {
 
       <DropdownMenu.Content align="end">
         <DropdownMenu.Item asChild>
+          <Link href="/signup">Sign Up</Link>
+        </DropdownMenu.Item>
+        <DropdownMenu.Item asChild>
           <Link href="/profile">Profile</Link>
         </DropdownMenu.Item>
 
@@ -26,6 +29,9 @@ export default function UserMenu() {
 
         <DropdownMenu.Item asChild>
           <Link href="/login">Login</Link>
+        </DropdownMenu.Item>
+        <DropdownMenu.Item asChild>
+          <Text>Log Out</Text>
         </DropdownMenu.Item>
       </DropdownMenu.Content>
     </DropdownMenu.Root>
