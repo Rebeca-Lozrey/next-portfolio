@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, OptionalId } from "mongodb";
 
 import { getCollection } from "@/lib/mongodb";
 
@@ -15,7 +15,7 @@ export interface ArticlesRepository {
 export const mongoArticlesRepository: ArticlesRepository = {
   async insert(article) {
     const collection =
-      await getCollection<Omit<Article, "id">>(COLLECTION_NAME);
+      await getCollection<OptionalId<ArticleDocument>>(COLLECTION_NAME);
     const result = await collection.insertOne(article);
     return result.insertedId.toString();
   },

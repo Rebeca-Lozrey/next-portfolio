@@ -1,0 +1,15 @@
+.container {
+  min-height: calc(100vh - 80px);
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+
+  background: radial-gradient(
+    circle at top,
+    var(--gray-4),
+    var(--color-background) 60%
+  );
+}

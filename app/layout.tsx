@@ -58,11 +58,7 @@ export default function RootLayout({
                   </nav>
                 </div>
               </header>
-              <div className="layout">
-                <aside className="sidebar-left"></aside>
-                <main className="site-content">{children}</main>
-                <aside className="sidebar-right"></aside>
-              </div>
+              {children}
               <ReactQueryDevtools initialIsOpen={false} />
             </QueryProvider>
           </Theme>
