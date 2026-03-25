@@ -1,12 +1,12 @@
-import { createUserAction } from "@/actions/createUserAction";
+import { registerAction } from "@/actions/registerAction";
 import SignupForm from "@/components/SignupForm";
 
-import styles from "./signup.module.css";
+import styles from "./page.module.css";
 
 export default function SignupPage() {
   return (
     <section className={styles.page}>
-      <SignupForm action={createUserAction} />
+      <SignupForm action={registerAction} />
     </section>
   );
 }

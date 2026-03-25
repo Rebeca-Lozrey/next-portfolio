@@ -1,0 +1,41 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+}
+
+.card {
+  width: 100%;
+  max-width: 520px;
+}
+
+.header {
+  margin-bottom: var(--space-5);
+}
+
+/* Avatar with accent color (important for visual weight) */
+.avatar {
+  background-color: var(--accent-9);
+  color: var(--accent-1);
+  box-shadow: var(--shadow-1);
+}
+
+/* Typography overrides (Radix handles most already) */
+.username {
+  color: var(--gray-12);
+}
+
+.email {
+  color: var(--gray-9);
+}
+
+/* Divider + spacing */
+.content {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--gray-5);
+}
+
+.bio {
+  color: var(--gray-11);
+}

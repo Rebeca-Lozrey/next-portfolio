@@ -9,7 +9,8 @@ import "@radix-ui/themes/styles.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import ThemeButton from "@/components/ThemeButton";
-import UserMenu from "@/components/UserMenu";
+import UserMenu from "@/components/UserMenu/UserMenu";
+import { getCurrentUser } from "@/lib/modules/auth/auth.service";
 import QueryProvider from "@/providers/QueryProvider";
 
 import "./globals.css";
@@ -29,11 +30,12 @@ export const metadata: Metadata = {
   description: "Typescript Vitest React Query",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getCurrentUser();
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
@@ -54,7 +56,7 @@ export default function RootLayout({
 
                   <nav className="topbar-menu">
                     <ThemeButton />
-                    <UserMenu />
+                    <UserMenu user={user} />
                   </nav>
                 </div>
               </header>

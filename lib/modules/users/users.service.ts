@@ -3,10 +3,10 @@ import type { UsersRepository } from "./users.repository";
 import type { User } from "./users.types";
 import type { CreateUserInput } from "./users.types";
 
-export async function createUserService(
+export async function createUser(
   repo: UsersRepository,
   input: CreateUserInput,
-): Promise<User> {
+): Promise<string> {
   const existing = await repo.findByEmail(input.email);
   if (existing) {
     throw new Error("Email already in use");
@@ -23,8 +23,13 @@ export async function createUserService(
 
   const id = await repo.insert(user);
 
-  return {
-    ...user,
-    id,
-  };
+  return id;
+}
+
+export async function getUserById(repo: UsersRepository, userId: string) {
+  return repo.findById(userId);
+}
+
+export async function getUserByEmail(repo: UsersRepository, email: string) {
+  return repo.findByEmail(email);
 }

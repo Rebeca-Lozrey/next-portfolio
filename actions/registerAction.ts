@@ -1,12 +1,18 @@
 "use server";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 import { z } from "zod";
 
+import { SESSION_COOKIE_NAME } from "@/lib/modules/auth/auth.constants";
+import { mongoSessionsRepository } from "@/lib/modules/sessions/sessions.repository";
+import { createSession } from "@/lib/modules/sessions/sessions.service";
 import { mongoUsersRepository } from "@/lib/modules/users/users.repository";
 import { createUserSchema } from "@/lib/modules/users/users.schema";
-import { createUserService } from "@/lib/modules/users/users.service";
+import { createUser } from "@/lib/modules/users/users.service";
 
-export async function createUserAction(
-  prevState: {
+export async function registerAction(
+  _: {
     message: string | null;
     error: string | null;
   },
@@ -21,12 +27,19 @@ export async function createUserAction(
 
     const parsed = createUserSchema.parse(raw);
 
-    const user = await createUserService(mongoUsersRepository, parsed);
+    const userId = await createUser(mongoUsersRepository, parsed);
 
-    return {
-      message: "User created successfully",
-      error: null,
-    };
+    const sessionId = await createSession(mongoSessionsRepository, userId);
+
+    const cookieStore = await cookies();
+
+    cookieStore.set(SESSION_COOKIE_NAME, sessionId, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       const issues = error.issues.map((issue) => issue.message).join(", ");
@@ -43,11 +56,11 @@ export async function createUserAction(
       };
     } else {
       console.error("Unknown error:", error);
+      return {
+        message: null,
+        error: "Something went wrong",
+      };
     }
-
-    return {
-      message: null,
-      error: "Something went wrong",
-    };
   }
+  redirect("/profile");
 }

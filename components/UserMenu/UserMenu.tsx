@@ -1,0 +1,61 @@
+"use client";
+import Link from "next/link";
+
+import { PersonIcon } from "@radix-ui/react-icons";
+import { DropdownMenu, IconButton, Text } from "@radix-ui/themes";
+
+import { User } from "@/lib/modules/users/users.types";
+
+import LogoutButton from "./LogoutButton";
+
+interface UserMenuProps {
+  user: User | null;
+}
+
+export default function UserMenu({ user }: UserMenuProps) {
+  const isAuthenticated = !!user;
+
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger>
+        <IconButton color="gray" variant="outline" highContrast>
+          <PersonIcon />
+        </IconButton>
+      </DropdownMenu.Trigger>
+
+      <DropdownMenu.Content align="end">
+        {isAuthenticated ? (
+          <>
+            <DropdownMenu.Label>
+              <Text size="2">{user.username}</Text>
+            </DropdownMenu.Label>
+
+            <DropdownMenu.Item asChild>
+              <Link href="/profile">Profile</Link>
+            </DropdownMenu.Item>
+
+            <DropdownMenu.Item asChild>
+              <Link href="/settings">Settings</Link>
+            </DropdownMenu.Item>
+
+            <DropdownMenu.Separator />
+
+            <DropdownMenu.Item asChild>
+              <LogoutButton />
+            </DropdownMenu.Item>
+          </>
+        ) : (
+          <>
+            <DropdownMenu.Item asChild>
+              <Link href="/login">Login</Link>
+            </DropdownMenu.Item>
+
+            <DropdownMenu.Item asChild>
+              <Link href="/signup">Sign Up</Link>
+            </DropdownMenu.Item>
+          </>
+        )}
+      </DropdownMenu.Content>
+    </DropdownMenu.Root>
+  );
+}

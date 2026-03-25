@@ -1,0 +1,17 @@
+.logoutButton {
+  all: unset;
+
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 6px 12px;
+
+  font-size: 14px;
+  line-height: 1;
+  color: inherit;
+
+  cursor: pointer;
+}

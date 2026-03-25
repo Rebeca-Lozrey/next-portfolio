@@ -1,11 +1,12 @@
+import { loginAction } from "@/actions/loginAction";
+import LoginForm from "@/components/LoginForm";
+
+import styles from "./page.module.css";
+
 export default function LoginPage() {
   return (
-    <main className="page">
-      <section className="hero">
-        <h1>Login</h1>
-
-        <p>Discover features with next speed.</p>
-      </section>
-    </main>
+    <section className={styles.page}>
+      <LoginForm action={loginAction} />
+    </section>
   );
 }
