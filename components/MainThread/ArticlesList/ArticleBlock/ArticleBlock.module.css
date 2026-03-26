@@ -8,12 +8,23 @@
 
 .header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .username {
   font-weight: 600;
+}
+
+.date {
+  font-size: 12px;
+  color: var(--gray-10);
 }
 
 .content {
@@ -26,4 +37,40 @@
   aspect-ratio: 16 / 9;
   border-radius: 10px;
   overflow: hidden;
+}
+
+/* Footer */
+.actions {
+  display: flex;
+  justify-content: space-between; /* left: likes, right: actions */
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* Likes count (same style as date) */
+.likesCount {
+  font-size: 12px;
+  color: var(--gray-10);
+}
+
+/* Actions group (right side) */
+.rightActions {
+  display: flex;
+  gap: 16px;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-11);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.actionButton:hover {
+  color: var(--gray-12);
 }

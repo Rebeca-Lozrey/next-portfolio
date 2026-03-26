@@ -1,6 +1,7 @@
 import Image from "next/image";
 
-import { Avatar } from "@radix-ui/themes";
+import { CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
+import { Avatar, IconButton } from "@radix-ui/themes";
 
 import type { Article } from "@/lib/modules/articles/articles.types";
 
@@ -12,13 +13,19 @@ interface ArticleBlockProps {
 }
 
 export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
-  const { authorUsername, content, imageUrl } = article;
+  const { authorUsername, content, imageUrl, createdAt } = article;
 
   return (
     <article className={styles.article}>
       <header className={styles.header}>
-        <Avatar fallback={authorUsername[0]} radius="full" size="2" />
-        <span className={styles.username}>{authorUsername}</span>
+        <div className={styles.author}>
+          <Avatar fallback={authorUsername[0]} radius="full" size="2" />
+          <span className={styles.username}>{authorUsername}</span>
+        </div>
+
+        <span className={styles.date}>
+          {new Date(createdAt).toLocaleDateString()}
+        </span>
       </header>
 
       <p className={styles.content}>{content}</p>
@@ -36,6 +43,18 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
           />
         </div>
       )}
+      <footer className={styles.actions}>
+        <span className={styles.likesCount}>12 likes</span>
+
+        <div className={styles.rightActions}>
+          <button className={styles.actionButton} aria-label="Like">
+            <IconButton size="1" variant="outline">
+              <CheckIcon />
+            </IconButton>
+            <span>LIKE</span>
+          </button>
+        </div>
+      </footer>
     </article>
   );
 }

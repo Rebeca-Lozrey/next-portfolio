@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
@@ -21,6 +21,13 @@ export default function ArticleForm() {
   const [isDirty, setIsDirty] = useState(false);
   const user = useUser();
 
+  useEffect(() => {
+    if (!uploaded) return;
+
+    const img = new Image();
+    img.src = uploaded;
+  }, [uploaded]);
+
   const queryClient = useQueryClient();
 
   const createArticleMutation = useMutation({
@@ -36,7 +43,7 @@ export default function ArticleForm() {
         authorUsername: user?.username || "",
         authorId: user?.id || "",
         id: "temp-id",
-        imageUrl: preview,
+        imageUrl: uploaded,
         createdAt: new Date().toISOString(),
       };
 
@@ -107,9 +114,7 @@ export default function ArticleForm() {
             size="3"
             alt="My profile photo"
           />
-          {/* <Avatar fallback={authorUsername[0]} radius="full" size="2" /> */}
         </div>
-
         <div className={fields}>
           <Form.Field name="content">
             <Form.Control asChild>

@@ -8,6 +8,7 @@ import { getArticles } from "@/lib/modules/articles/articles.api";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
 
 import ArticleBlock from "./ArticleBlock";
+import styles from "./ArticlesList.module.css";
 
 export default function ArticlesList() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -42,7 +43,7 @@ export default function ArticlesList() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <section>
+    <section className={styles.feed}>
       {data?.pages.map((page) =>
         page.articles.map((article, index) => {
           if (index === 0) {
