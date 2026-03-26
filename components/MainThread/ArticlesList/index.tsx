@@ -42,15 +42,20 @@ export default function ArticlesList() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div>
+    <section>
       {data?.pages.map((page) =>
-        page.articles.map((article, index) => (
-          <ArticleBlock
-            key={article.id}
-            article={article}
-            priority={index === 0}
-          />
-        )),
+        page.articles.map((article, index) => {
+          if (index === 0) {
+            console.log({ article });
+          }
+          return (
+            <ArticleBlock
+              key={article.id}
+              article={article}
+              priority={index === 0}
+            />
+          );
+        }),
       )}
 
       <div ref={loadMoreRef} />
@@ -62,6 +67,6 @@ export default function ArticlesList() {
           <button onClick={() => fetchNextPage()}>Retry</button>
         </div>
       )}
-    </div>
+    </section>
   );
 }

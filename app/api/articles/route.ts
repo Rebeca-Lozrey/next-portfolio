@@ -1,22 +1,31 @@
 import { NextResponse } from "next/server";
 
 import { mongoArticlesRepository } from "@/lib/modules/articles/articles.repository";
+import { createArticleSchema } from "@/lib/modules/articles/articles.schema";
 import { createArticleService } from "@/lib/modules/articles/articles.service";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { content } = body;
+    const parsed = createArticleSchema.safeParse(body);
 
-    if (!content || typeof content !== "string") {
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Content is required" },
+        {
+          errors: parsed.error.issues.map((issue) => ({
+            field: issue.path.join("."),
+            message: issue.message,
+          })),
+        },
         { status: 400 },
       );
     }
 
-    const article = await createArticleService(mongoArticlesRepository, body);
+    const article = await createArticleService(
+      mongoArticlesRepository,
+      parsed.data,
+    );
 
     return NextResponse.json(article);
   } catch (error) {

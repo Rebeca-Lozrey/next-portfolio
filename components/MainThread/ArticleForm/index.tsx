@@ -11,45 +11,72 @@ import ImageUploadButton from "@/components/ImageUploadButton";
 import { createArticle } from "@/lib/modules/articles/articles.api";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
 import { ArticlesPage } from "@/lib/modules/articles/articles.types";
+import { useUser } from "@/providers/UserProvider";
 
 import styles from "./ArticleForm.module.css";
 
 export default function ArticleForm() {
-  const [uploaded, setUploaded] = useState<string | null>(null);
+  const [uploaded, setUploaded] = useState<string | undefined>(undefined);
   const [preview, setPreview] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const user = useUser();
 
   const queryClient = useQueryClient();
 
   const createArticleMutation = useMutation({
     mutationFn: createArticle,
-    onSuccess: (newArticle) => {
+
+    onMutate: async (newArticleInput) => {
+      await queryClient.cancelQueries({ queryKey: articlesKeys.all });
+
+      const prevData = queryClient.getQueryData(articlesKeys.all);
+
+      const optimisticArticle = {
+        ...newArticleInput,
+        authorUsername: user?.username || "",
+        authorId: user?.id || "",
+        id: "temp-id",
+        imageUrl: preview,
+        createdAt: new Date().toISOString(),
+      };
+
       queryClient.setQueryData(
         articlesKeys.all,
-        (prevData: InfiniteData<ArticlesPage> | undefined) => {
-          if (!prevData) return;
+        (old: InfiniteData<ArticlesPage> | undefined) => {
+          if (!old) return old;
 
           return {
-            ...prevData,
+            ...old,
             pages: [
               {
-                ...prevData.pages[0],
-                articles: [newArticle, ...prevData.pages[0].articles],
+                ...old.pages[0],
+                articles: [optimisticArticle, ...old.pages[0].articles],
               },
-              ...prevData.pages.slice(1),
+              ...old.pages.slice(1),
             ],
           };
         },
       );
-      queryClient.invalidateQueries({ queryKey: articlesKeys.all });
+
+      return { prevData };
     },
-    onError: () => {
+
+    onError: (_err, _vars, context) => {
+      if (context?.prevData) {
+        queryClient.setQueryData(articlesKeys.all, context.prevData);
+      }
       console.error("Failed to publish article");
+    },
+
+    onSuccess: (_) => {
+      queryClient.invalidateQueries({ queryKey: articlesKeys.all });
     },
   });
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
+    setIsDirty(false);
 
     const formData = new FormData(form);
     const content = formData.get("content") as string;
@@ -62,7 +89,7 @@ export default function ArticleForm() {
       {
         onSuccess: () => {
           form.reset();
-          setUploaded(null);
+          setUploaded(undefined);
           setPreview(null);
         },
       },
@@ -71,10 +98,16 @@ export default function ArticleForm() {
 
   const { root, form, avatar, fields, inline, textarea } = styles;
   return (
-    <div className={root}>
+    <section className={root}>
       <Form.Root className={form} onSubmit={handleSubmit}>
         <div className={avatar}>
-          <Avatar fallback="U" radius="full" size="3" alt="My profile photo" />
+          <Avatar
+            fallback={user?.username[0] || "U"}
+            radius="full"
+            size="3"
+            alt="My profile photo"
+          />
+          {/* <Avatar fallback={authorUsername[0]} radius="full" size="2" /> */}
         </div>
 
         <div className={fields}>
@@ -88,6 +121,7 @@ export default function ArticleForm() {
                 required
                 color="gray"
                 aria-label="Post content"
+                onFocus={() => setIsDirty(true)}
               />
             </Form.Control>
 
@@ -104,7 +138,7 @@ export default function ArticleForm() {
             />
             <Form.Submit asChild>
               <Button
-                disabled={createArticleMutation.isPending}
+                disabled={createArticleMutation.isPending || !user}
                 color={createArticleMutation.isError ? "red" : "blue"}
               >
                 {createArticleMutation.isPending ? "Posting..." : "Post"}
@@ -112,17 +146,27 @@ export default function ArticleForm() {
             </Form.Submit>
           </div>
           <div>
-            {createArticleMutation.isError && (
+            {createArticleMutation.isError && createArticleMutation.error && (
               <Callout.Root size="1" color="red" role="alert">
                 <Callout.Icon>
                   <CrossCircledIcon />
                 </Callout.Icon>
-                <Callout.Text>Failed to publish article</Callout.Text>
+                <Callout.Text>{"Failed to publish article"}</Callout.Text>
+              </Callout.Root>
+            )}
+            {!user && isDirty && (
+              <Callout.Root size="1" color="red" role="alert">
+                <Callout.Icon>
+                  <CrossCircledIcon />
+                </Callout.Icon>
+                <Callout.Text>
+                  {"Please log in to publish an article."}
+                </Callout.Text>
               </Callout.Root>
             )}
           </div>
         </div>
       </Form.Root>
-    </div>
+    </section>
   );
 }

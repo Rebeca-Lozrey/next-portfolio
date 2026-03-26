@@ -1,18 +1,20 @@
+import { getCurrentUser } from "../auth/auth.service";
 import type { ArticlesRepository } from "./articles.repository";
-import type { Article } from "./articles.types";
-
-interface CreateArticleInput {
-  content: string;
-  imageUrl?: string | null;
-}
+import type { Article, CreateArticleRequest } from "./articles.types";
 
 export async function createArticleService(
   repo: ArticlesRepository,
-  input: CreateArticleInput,
+  input: CreateArticleRequest,
 ): Promise<Article> {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    throw new Error("UNAUTHORIZED");
+  }
+
   const article: Omit<Article, "id"> = {
-    authorId: "user.id",
-    authorUsername: "user.username",
+    authorId: user.id,
+    authorUsername: user.username,
     content: input.content,
     imageUrl: input.imageUrl ?? null,
     likeCount: 0,

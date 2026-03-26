@@ -4,15 +4,12 @@ import Link from "next/link";
 import { PersonIcon } from "@radix-ui/react-icons";
 import { DropdownMenu, IconButton, Text } from "@radix-ui/themes";
 
-import { User } from "@/lib/modules/users/users.types";
+import { useUser } from "@/providers/UserProvider";
 
 import LogoutButton from "./LogoutButton";
 
-interface UserMenuProps {
-  user: User | null;
-}
-
-export default function UserMenu({ user }: UserMenuProps) {
+export default function UserMenu() {
+  const user = useUser();
   const isAuthenticated = !!user;
 
   return (

@@ -9,9 +9,10 @@ import "@radix-ui/themes/styles.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import ThemeButton from "@/components/ThemeButton";
-import UserMenu from "@/components/UserMenu/UserMenu";
+import UserMenu from "@/components/UserMenu";
 import { getCurrentUser } from "@/lib/modules/auth/auth.service";
 import QueryProvider from "@/providers/QueryProvider";
+import { UserProvider } from "@/providers/UserProvider";
 
 import "./globals.css";
 
@@ -42,26 +43,28 @@ export default async function RootLayout({
         <ThemeProvider attribute="class">
           <Theme>
             <QueryProvider>
-              <header className="topbar">
-                <div className="topbar-inner">
-                  <Link href="/">
-                    <Image
-                      src="/logo.svg"
-                      alt="social logo"
-                      width={72}
-                      height={18}
-                      priority
-                    />
-                  </Link>
+              <UserProvider user={user}>
+                <header className="topbar">
+                  <div className="topbar-inner">
+                    <Link href="/">
+                      <Image
+                        src="/logo.svg"
+                        alt="social logo"
+                        width={72}
+                        height={18}
+                        priority
+                      />
+                    </Link>
 
-                  <nav className="topbar-menu">
-                    <ThemeButton />
-                    <UserMenu user={user} />
-                  </nav>
-                </div>
-              </header>
-              {children}
-              <ReactQueryDevtools initialIsOpen={false} />
+                    <nav className="topbar-menu">
+                      <ThemeButton />
+                      <UserMenu />
+                    </nav>
+                  </div>
+                </header>
+                {children}
+                <ReactQueryDevtools initialIsOpen={false} />
+              </UserProvider>
             </QueryProvider>
           </Theme>
         </ThemeProvider>

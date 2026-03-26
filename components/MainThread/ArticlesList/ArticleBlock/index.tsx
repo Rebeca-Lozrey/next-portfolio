@@ -32,6 +32,7 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
             fill
             sizes="(max-width: 768px) 100vw, 640px"
             style={{ objectFit: "cover" }}
+            unoptimized={true}
           />
         </div>
       )}
