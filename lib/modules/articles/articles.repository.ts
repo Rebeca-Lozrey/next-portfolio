@@ -2,14 +2,16 @@ import { ObjectId, OptionalId } from "mongodb";
 
 import { getCollection } from "@/lib/mongodb";
 
-import type { Article, ArticleDocument, ArticlesPage } from "./articles.types";
+import type { ArticleDocument, ArticlesDocumentPage } from "./articles.types";
 
 const COLLECTION_NAME = "articles";
 
 export interface ArticlesRepository {
-  insert(article: Omit<Article, "id">): Promise<string>;
+  insert(article: Omit<ArticleDocument, "_id">): Promise<string>;
   findById(id: string): Promise<ArticleDocument | null>;
-  infiniteByCursor(cursor?: string): Promise<ArticlesPage>;
+  infiniteByCursor(cursor?: string): Promise<ArticlesDocumentPage>;
+  decrementLikes(articleId: string): Promise<void>;
+  incrementLikes(articleId: string): Promise<void>;
 }
 
 export const mongoArticlesRepository: ArticlesRepository = {
@@ -37,11 +39,26 @@ export const mongoArticlesRepository: ArticlesRepository = {
       .toArray();
 
     return {
-      articles: docs.map((doc) => ({
-        ...doc,
-        id: doc._id.toString(),
-      })),
+      articles: docs,
       nextCursor: docs.length ? docs[docs.length - 1]._id.toString() : null,
     };
+  },
+
+  async decrementLikes(articleId) {
+    const collection = await getCollection(COLLECTION_NAME);
+
+    await collection.updateOne(
+      { _id: new ObjectId(articleId), likeCount: { $gt: 0 } },
+      { $inc: { likeCount: -1 } },
+    );
+  },
+
+  async incrementLikes(articleId) {
+    const collection = await getCollection(COLLECTION_NAME);
+
+    await collection.updateOne(
+      { _id: new ObjectId(articleId) },
+      { $inc: { likeCount: 1 } },
+    );
   },
 };

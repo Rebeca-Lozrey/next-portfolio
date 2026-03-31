@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 
 import { mongoArticlesRepository } from "@/lib/modules/articles/articles.repository";
 import { createArticleSchema } from "@/lib/modules/articles/articles.schema";
-import { createArticleService } from "@/lib/modules/articles/articles.service";
+import {
+  createArticleService,
+  getArticlesPage,
+} from "@/lib/modules/articles/articles.service";
+import { mongoLikesRepository } from "@/lib/modules/likes/likes.repository";
 
 export async function POST(req: Request) {
   try {
@@ -43,7 +47,11 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const cursor = searchParams.get("cursor") ?? undefined;
 
-    const page = await mongoArticlesRepository.infiniteByCursor(cursor);
+    const page = await getArticlesPage(
+      mongoArticlesRepository,
+      mongoLikesRepository,
+      cursor,
+    );
     return NextResponse.json(page);
   } catch (error) {
     console.error("Fetch articles error:", error);

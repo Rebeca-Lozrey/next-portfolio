@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import z from "zod";
 
-import { articleModel, createArticleSchema } from "./articles.schema";
+import { createArticleSchema } from "./articles.schema";
 
 export interface ArticleDocument {
   _id: ObjectId;
@@ -20,7 +20,13 @@ export interface Article {
   content: string;
   imageUrl: string | null;
   likeCount: number;
+  likedByUser: boolean;
   createdAt: Date;
+}
+
+export interface ArticlesDocumentPage {
+  articles: ArticleDocument[];
+  nextCursor: string | null;
 }
 
 export interface ArticlesPage {
@@ -29,4 +35,3 @@ export interface ArticlesPage {
 }
 
 export type CreateArticleRequest = z.infer<typeof createArticleSchema>;
-export type ArticleModel = z.infer<typeof articleModel>;

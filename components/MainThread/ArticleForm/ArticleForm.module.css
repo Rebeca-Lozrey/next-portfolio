@@ -26,3 +26,9 @@
 .textarea :global(.rt-TextAreaInput) {
   font-size: inherit;
 }
+
+.rightActions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}

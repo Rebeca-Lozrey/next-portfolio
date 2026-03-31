@@ -59,18 +59,22 @@
   gap: 16px;
 }
 
-.actionButton {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 500;
+.likeButton {
+  font-size: var(--font-size-2);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.05em;
+
   color: var(--gray-11);
-  background: none;
-  border: none;
-  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    transform 0.1s ease;
 }
 
-.actionButton:hover {
-  color: var(--gray-12);
+.likeButtonLabel {
+  font-size: var(--font-size-1);
+}
+
+.likedButtonLabel {
+  font-size: var(--font-size-1);
+  color: var(--gray-6);
 }

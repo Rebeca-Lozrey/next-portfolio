@@ -46,9 +46,6 @@ export default function ArticlesList() {
     <section className={styles.feed}>
       {data?.pages.map((page) =>
         page.articles.map((article, index) => {
-          if (index === 0) {
-            console.log({ article });
-          }
           return (
             <ArticleBlock
               key={article.id}

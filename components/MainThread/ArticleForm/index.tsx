@@ -19,6 +19,7 @@ export default function ArticleForm() {
   const [uploaded, setUploaded] = useState<string | undefined>(undefined);
   const [preview, setPreview] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [value, setValue] = useState("");
   const user = useUser();
 
   useEffect(() => {
@@ -96,6 +97,7 @@ export default function ArticleForm() {
       {
         onSuccess: () => {
           form.reset();
+          setValue("");
           setUploaded(undefined);
           setPreview(null);
         },
@@ -127,6 +129,9 @@ export default function ArticleForm() {
                 color="gray"
                 aria-label="Post content"
                 onFocus={() => setIsDirty(true)}
+                maxLength={280}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
               />
             </Form.Control>
 
@@ -141,14 +146,19 @@ export default function ArticleForm() {
               setPreview={setPreview}
               preview={preview}
             />
-            <Form.Submit asChild>
-              <Button
-                disabled={createArticleMutation.isPending || !user}
-                color={createArticleMutation.isError ? "red" : "blue"}
-              >
-                {createArticleMutation.isPending ? "Posting..." : "Post"}
-              </Button>
-            </Form.Submit>
+            <div className={styles.rightActions}>
+              <div style={{ color: value.length > 260 ? "red" : "inherit" }}>
+                {value.length}/280
+              </div>
+              <Form.Submit asChild>
+                <Button
+                  disabled={createArticleMutation.isPending || !user}
+                  color={createArticleMutation.isError ? "red" : "blue"}
+                >
+                  {createArticleMutation.isPending ? "Posting..." : "Post"}
+                </Button>
+              </Form.Submit>
+            </div>
           </div>
           <div>
             {createArticleMutation.isError && createArticleMutation.error && (

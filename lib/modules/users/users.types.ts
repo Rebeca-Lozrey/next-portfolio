@@ -20,8 +20,3 @@ export interface UserDocument {
 }
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
-
-export interface LoginInput {
-  email: string;
-  password: string;
-}
