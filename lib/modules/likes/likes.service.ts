@@ -1,3 +1,5 @@
+import { isDuplicateKeyError } from "@/lib/shared/mongo.utils";
+
 import { ArticlesRepository } from "../articles/articles.repository";
 import { getCurrentUser } from "../auth/auth.service";
 import type { LikesRepository } from "./likes.repository";
@@ -36,14 +38,4 @@ export async function toggleLike(
     }
     throw err;
   }
-}
-
-function isDuplicateKeyError(error: unknown): boolean {
-  console.error(error);
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === 11000
-  );
 }

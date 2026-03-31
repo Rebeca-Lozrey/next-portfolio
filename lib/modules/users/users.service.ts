@@ -1,3 +1,8 @@
+import {
+  getDuplicateField,
+  isDuplicateKeyError,
+} from "@/lib/shared/mongo.utils";
+
 import { hashPassword } from "../auth/password";
 import type { UsersRepository } from "./users.repository";
 import type { User } from "./users.types";
@@ -21,9 +26,25 @@ export async function createUser(
     createdAt: new Date(),
   };
 
-  const id = await repo.insert(user);
+  try {
+    return await repo.insert(user);
+  } catch (error) {
+    if (isDuplicateKeyError(error)) {
+      const field = getDuplicateField(error);
 
-  return id;
+      if (field === "email") {
+        throw new Error("Email already in use");
+      }
+
+      if (field === "username") {
+        throw new Error("Username already taken");
+      }
+
+      throw new Error("Duplicate value");
+    }
+
+    throw error;
+  }
 }
 
 export async function getUserById(repo: UsersRepository, userId: string) {
