@@ -4,13 +4,9 @@ import { useEffect, useState } from "react";
 import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
 import { Avatar, Button, Callout, TextArea } from "@radix-ui/themes";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { InfiniteData } from "@tanstack/react-query";
 
 import ImageUploadButton from "@/components/ImageUploadButton";
-import { createArticle } from "@/lib/modules/articles/articles.api";
-import { articlesKeys } from "@/lib/modules/articles/articles.keys";
-import { ArticlesPage } from "@/lib/modules/articles/articles.types";
+import { useCreateArticleMutation } from "@/lib/modules/articles/hooks/useCreateArticleMutation";
 import { useUser } from "@/providers/UserProvider";
 
 import styles from "./ArticleForm.module.css";
@@ -29,57 +25,7 @@ export default function ArticleForm() {
     img.src = uploaded;
   }, [uploaded]);
 
-  const queryClient = useQueryClient();
-
-  const createArticleMutation = useMutation({
-    mutationFn: createArticle,
-
-    onMutate: async (newArticleInput) => {
-      await queryClient.cancelQueries({ queryKey: articlesKeys.all });
-
-      const prevData = queryClient.getQueryData(articlesKeys.all);
-
-      const optimisticArticle = {
-        ...newArticleInput,
-        authorUsername: user?.username || "",
-        authorId: user?.id || "",
-        id: "temp-id",
-        imageUrl: uploaded,
-        createdAt: new Date().toISOString(),
-      };
-
-      queryClient.setQueryData(
-        articlesKeys.all,
-        (old: InfiniteData<ArticlesPage> | undefined) => {
-          if (!old) return old;
-
-          return {
-            ...old,
-            pages: [
-              {
-                ...old.pages[0],
-                articles: [optimisticArticle, ...old.pages[0].articles],
-              },
-              ...old.pages.slice(1),
-            ],
-          };
-        },
-      );
-
-      return { prevData };
-    },
-
-    onError: (_err, _vars, context) => {
-      if (context?.prevData) {
-        queryClient.setQueryData(articlesKeys.all, context.prevData);
-      }
-      console.error("Failed to publish article");
-    },
-
-    onSuccess: (_) => {
-      queryClient.invalidateQueries({ queryKey: articlesKeys.all });
-    },
-  });
+  const createArticleMutation = useCreateArticleMutation(user, uploaded);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();

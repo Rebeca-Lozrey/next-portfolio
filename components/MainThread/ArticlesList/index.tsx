@@ -6,19 +6,28 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { getArticles } from "@/lib/modules/articles/articles.api";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
+import { ArticlesPage } from "@/lib/modules/articles/articles.types";
 
 import ArticleBlock from "./ArticleBlock";
 import styles from "./ArticlesList.module.css";
 
-export default function ArticlesList() {
+export default function ArticlesList({
+  initialPage,
+}: {
+  initialPage: ArticlesPage;
+}) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isError } =
     useInfiniteQuery({
       queryKey: articlesKeys.all,
-      queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
+      queryFn: ({ pageParam }: { pageParam: string | null }) =>
         getArticles(pageParam),
-      initialPageParam: undefined,
+      initialPageParam: null,
       getNextPageParam: (lastPage) => lastPage.nextCursor,
+      initialData: {
+        pages: [initialPage],
+        pageParams: [null],
+      },
     });
 
   useEffect(() => {

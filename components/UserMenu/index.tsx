@@ -32,7 +32,7 @@ export default function UserMenu() {
             </DropdownMenu.Item>
 
             <DropdownMenu.Item asChild>
-              <Link href="/settings">Settings</Link>
+              <Link href="/my-articles">My Articles</Link>
             </DropdownMenu.Item>
 
             <DropdownMenu.Separator />

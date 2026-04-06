@@ -45,7 +45,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const cursor = searchParams.get("cursor") ?? undefined;
+    const cursor = searchParams.get("cursor") ?? null;
 
     const page = await getArticlesPage(
       mongoArticlesRepository,

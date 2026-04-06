@@ -12,6 +12,10 @@ export interface ArticlesRepository {
   infiniteByCursor(cursor?: string): Promise<ArticlesDocumentPage>;
   decrementLikes(articleId: string): Promise<void>;
   incrementLikes(articleId: string): Promise<void>;
+  infiniteByUserCursor(
+    userId: string,
+    cursor: string | null,
+  ): Promise<ArticlesDocumentPage>;
 }
 
 export const mongoArticlesRepository: ArticlesRepository = {
@@ -60,5 +64,25 @@ export const mongoArticlesRepository: ArticlesRepository = {
       { _id: new ObjectId(articleId) },
       { $inc: { likeCount: 1 } },
     );
+  },
+
+  async infiniteByUserCursor(userId, cursor = null) {
+    const collection = await getCollection<ArticleDocument>(COLLECTION_NAME);
+
+    const query = {
+      authorId: userId,
+      ...(cursor && { _id: { $lt: new ObjectId(cursor) } }),
+    };
+
+    const docs = await collection
+      .find(query)
+      .sort({ _id: -1 })
+      .limit(10)
+      .toArray();
+
+    return {
+      articles: docs,
+      nextCursor: docs.length ? docs[docs.length - 1]._id.toString() : null,
+    };
   },
 };

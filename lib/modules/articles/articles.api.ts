@@ -19,11 +19,29 @@ export async function createArticle(payload: CreateArticleRequest) {
   return res.json();
 }
 
-export async function getArticles(cursor?: string): Promise<ArticlesPage> {
+export async function getArticles(
+  cursor: string | null,
+): Promise<ArticlesPage> {
   const res = await fetch(`/api/articles?cursor=${cursor ?? ""}`);
 
   if (!res.ok) {
     throw new Error("Failed to fetch articles");
+  }
+
+  return res.json();
+}
+
+export async function getMyArticles(
+  cursor: string | null,
+): Promise<ArticlesPage> {
+  const url = cursor ? `/api/articles/me?cursor=${cursor}` : `/api/articles/me`;
+  const res = await fetch(url, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch my articles");
   }
 
   return res.json();

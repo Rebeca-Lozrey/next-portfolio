@@ -35,7 +35,7 @@ export async function createArticleService(
 export async function getArticlesPage(
   articlesRepo: ArticlesRepository,
   likesRepo: LikesRepository,
-  cursor: string | undefined,
+  cursor: string | null,
 ): Promise<ArticlesPage> {
   const user = await getCurrentUser();
   const rawPage = await articlesRepo.infiniteByCursor(cursor);
@@ -59,5 +59,38 @@ export async function getArticlesPage(
     })),
     nextCursor: rawPage.nextCursor,
   };
+  return page;
+}
+
+export async function getMyArticlesPage(
+  articlesRepo: ArticlesRepository,
+  likesRepo: LikesRepository,
+  cursor: string | null,
+): Promise<ArticlesPage> {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  const rawPage = await articlesRepo.infiniteByUserCursor(user.id, cursor);
+
+  const likes = await likesRepo.findByUser(user.id);
+  const likedSet = new Set(likes.map((l) => l.articleId));
+
+  const page: ArticlesPage = {
+    articles: rawPage.articles.map((doc) => ({
+      id: doc._id.toString(),
+      authorId: doc.authorId,
+      authorUsername: doc.authorUsername,
+      content: doc.content,
+      imageUrl: doc.imageUrl,
+      likeCount: doc.likeCount,
+      likedByUser: likedSet.has(doc._id.toString()),
+      createdAt: doc.createdAt,
+    })),
+    nextCursor: rawPage.nextCursor,
+  };
+
   return page;
 }
