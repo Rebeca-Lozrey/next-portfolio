@@ -9,7 +9,7 @@ const COLLECTION_NAME = "articles";
 export interface ArticlesRepository {
   insert(article: Omit<ArticleDocument, "_id">): Promise<string>;
   findById(id: string): Promise<ArticleDocument | null>;
-  infiniteByCursor(cursor?: string): Promise<ArticlesDocumentPage>;
+  infiniteByCursor(cursor: string | null): Promise<ArticlesDocumentPage>;
   decrementLikes(articleId: string): Promise<void>;
   incrementLikes(articleId: string): Promise<void>;
   infiniteByUserCursor(
