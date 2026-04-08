@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
 import { Avatar, Button, Callout, TextArea } from "@radix-ui/themes";
+import { useMutation } from "@tanstack/react-query";
 
-import ImageUploadButton from "@/components/ImageUploadButton";
+import ImageUploadButton from "@/components/ArticleForm/ImageUploadButton";
+import { uploadImage } from "@/lib/cloudinary/uploadImage";
 import { useCreateArticleMutation } from "@/lib/modules/articles/hooks/useCreateArticleMutation";
 import { useUser } from "@/providers/UserProvider";
 
@@ -24,6 +26,13 @@ export default function ArticleForm() {
     const img = new Image();
     img.src = uploaded;
   }, [uploaded]);
+
+  const uploadMutation = useMutation({
+    mutationFn: uploadImage,
+    onSuccess: (url) => {
+      setUploaded(url);
+    },
+  });
 
   const createArticleMutation = useCreateArticleMutation(user, uploaded);
 
@@ -88,7 +97,7 @@ export default function ArticleForm() {
 
           <div className={inline}>
             <ImageUploadButton
-              setUploaded={setUploaded}
+              uploadMutation={uploadMutation}
               setPreview={setPreview}
               preview={preview}
             />
@@ -98,7 +107,11 @@ export default function ArticleForm() {
               </div>
               <Form.Submit asChild>
                 <Button
-                  disabled={createArticleMutation.isPending || !user}
+                  disabled={
+                    createArticleMutation.isPending ||
+                    !user ||
+                    uploadMutation.isPending
+                  }
                   color={createArticleMutation.isError ? "red" : "blue"}
                 >
                   {createArticleMutation.isPending ? "Posting..." : "Post"}

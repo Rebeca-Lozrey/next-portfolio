@@ -16,6 +16,7 @@ export interface ArticlesRepository {
     userId: string,
     cursor: string | null,
   ): Promise<ArticlesDocumentPage>;
+  deleteByIdAndAuthor(id: string, authorId: string): Promise<boolean>;
 }
 
 export const mongoArticlesRepository: ArticlesRepository = {
@@ -84,5 +85,14 @@ export const mongoArticlesRepository: ArticlesRepository = {
       articles: docs,
       nextCursor: docs.length ? docs[docs.length - 1]._id.toString() : null,
     };
+  },
+
+  async deleteByIdAndAuthor(id, authorId) {
+    const collection = await getCollection<ArticleDocument>(COLLECTION_NAME);
+    const result = await collection.deleteOne({
+      _id: new ObjectId(id),
+      authorId,
+    });
+    return result.deletedCount === 1;
   },
 };

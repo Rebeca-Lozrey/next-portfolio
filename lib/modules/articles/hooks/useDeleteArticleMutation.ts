@@ -4,10 +4,9 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
+import { deleteArticle } from "@/lib/modules/articles/articles.api";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
 import { ArticlesPage } from "@/lib/modules/articles/articles.types";
-
-import { createLike } from "../../likes/likes.api";
 
 const optimisticUpdate =
   (articleId: string) => (old: InfiniteData<ArticlesPage> | undefined) => {
@@ -16,29 +15,18 @@ const optimisticUpdate =
       ...old,
       pages: old.pages.map((page) => ({
         ...page,
-        articles: page.articles.map((article) => {
-          if (article.id === articleId) {
-            return {
-              ...article,
-              likedByUser: !article.likedByUser,
-              likeCount: article.likedByUser
-                ? article.likeCount - 1
-                : article.likeCount + 1,
-            };
-          }
-          return article;
-        }),
+        articles: page.articles.filter((article) => article.id !== articleId),
       })),
     };
   };
 
-export default function useLikeArticleMutation() {
+export default function useDeleteArticleMutation() {
   const queryClient = useQueryClient();
 
-  const likeMutation = useMutation({
-    mutationFn: createLike,
+  const deleteMutation = useMutation({
+    mutationFn: deleteArticle,
 
-    onMutate: async ({ articleId }) => {
+    onMutate: async (articleId) => {
       await queryClient.cancelQueries({ queryKey: articlesKeys.all });
 
       const snapshot = {
@@ -63,7 +51,7 @@ export default function useLikeArticleMutation() {
       if (context?.myArticles) {
         queryClient.setQueryData(articlesKeys.myArticles, context.myArticles);
       }
-      console.error("Failed to publish article");
+      console.error("Failed to delete article");
     },
 
     onSettled: (_) => {
@@ -71,5 +59,5 @@ export default function useLikeArticleMutation() {
     },
   });
 
-  return likeMutation;
+  return deleteMutation;
 }

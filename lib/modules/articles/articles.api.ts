@@ -46,3 +46,16 @@ export async function getMyArticles(
 
   return res.json();
 }
+
+export async function deleteArticle(articleId: string) {
+  const res = await fetch(`/api/articles/${articleId}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete article");
+  }
+
+  return res.json();
+}

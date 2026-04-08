@@ -36,7 +36,7 @@ export async function loginAction(
       };
     }
 
-    const isValid = verifyPassword(parsed.password, user.passwordHash);
+    const isValid = await verifyPassword(parsed.password, user.passwordHash);
 
     if (!isValid) {
       return {

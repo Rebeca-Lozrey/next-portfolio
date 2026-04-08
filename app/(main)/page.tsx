@@ -1,20 +1,16 @@
-import MainThread from "@/components/MainThread";
-import { mongoArticlesRepository } from "@/lib/modules/articles/articles.repository";
-import { getArticlesPage } from "@/lib/modules/articles/articles.service";
-import { mongoLikesRepository } from "@/lib/modules/likes/likes.repository";
+import { Suspense } from "react";
+
+import ArticleForm from "@/components/ArticleForm";
+import ArticlesListInitialPage from "@/components/ArticlesList/ArticlesListInitialPage";
+import ArticlesListSkeleton from "@/components/ArticlesList/ArticlesListSkeleton";
 
 export default async function Home() {
-  const initialPage = await getArticlesPage(
-    mongoArticlesRepository,
-    mongoLikesRepository,
-    null,
-  );
-
   return (
-    <>
-      <div className="thread">
-        <MainThread initialPage={initialPage} />
-      </div>
-    </>
+    <div className="thread">
+      <ArticleForm />
+      <Suspense fallback={<ArticlesListSkeleton />}>
+        <ArticlesListInitialPage />
+      </Suspense>
+    </div>
   );
 }

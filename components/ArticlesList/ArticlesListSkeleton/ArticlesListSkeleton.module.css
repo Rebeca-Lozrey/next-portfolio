@@ -1,0 +1,47 @@
+.thread {
+  border-right: 1px solid var(--gray-3);
+  border-left: 1px solid var(--gray-3);
+}
+
+.formCard {
+  border: none;
+  border-bottom: 1px solid var(--gray-4);
+  border-radius: 0;
+  padding: 16px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.inlineRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.avatar {
+  border-radius: 9999px;
+}
+
+.articleCard {
+  border: none;
+  border-bottom: 1px solid var(--gray-4);
+  border-radius: 0;
+  padding: 16px;
+}
+
+.imageSkeleton {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+}

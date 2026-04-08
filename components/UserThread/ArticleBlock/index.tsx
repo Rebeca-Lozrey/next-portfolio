@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import DeleteButton from "@/components/DeleteButton";
 import LikeButton from "@/components/LikeButton";
 import type { Article } from "@/lib/modules/articles/articles.types";
 
@@ -40,6 +41,7 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
       <footer className={styles.actions}>
         <span className={styles.likesCount}>{likeCount} likes</span>
         <div className={styles.rightActions}>
+          <DeleteButton articleId={id} />
           <LikeButton articleId={id} likedByUser={likedByUser} />
         </div>
       </footer>

@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 import { getCurrentUser } from "../auth/auth.service";
 import { LikesRepository } from "../likes/likes.repository";
 import { type ArticlesRepository } from "./articles.repository";
@@ -93,4 +95,25 @@ export async function getMyArticlesPage(
   };
 
   return page;
+}
+
+export async function deleteArticleService(
+  repo: ArticlesRepository,
+  articleId: string,
+): Promise<void> {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  if (!ObjectId.isValid(articleId)) {
+    throw new Error("INVALID_ID");
+  }
+
+  const deleted = await repo.deleteByIdAndAuthor(articleId, user.id);
+
+  if (!deleted) {
+    throw new Error("NOT_FOUND");
+  }
 }

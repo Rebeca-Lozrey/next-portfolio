@@ -6,33 +6,25 @@ import Image from "next/image";
 
 import { CrossCircledIcon, ImageIcon } from "@radix-ui/react-icons";
 import { IconButton, Spinner } from "@radix-ui/themes";
-import { useMutation } from "@tanstack/react-query";
+import { UseMutationResult } from "@tanstack/react-query";
 
-import { uploadImage } from "@/lib/cloudinary/uploadImage";
 import { useUser } from "@/providers/UserProvider";
 
 import styles from "./ImageUploadButton.module.css";
 
 interface ImageUploadButton {
-  setUploaded: React.Dispatch<React.SetStateAction<string | undefined>>;
+  uploadMutation: UseMutationResult<string, Error, File, unknown>;
   setPreview: React.Dispatch<React.SetStateAction<string | null>>;
   preview: string | null;
 }
 
 export default function ImageUploadButton({
-  setUploaded,
+  uploadMutation,
   setPreview,
   preview,
 }: ImageUploadButton) {
   const user = useUser();
   const inputRef = useRef<HTMLInputElement | null>(null);
-
-  const uploadMutation = useMutation({
-    mutationFn: uploadImage,
-    onSuccess: (url) => {
-      setUploaded(url);
-    },
-  });
 
   const handleClick = () => {
     inputRef.current?.click();

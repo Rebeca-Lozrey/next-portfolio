@@ -1,0 +1,30 @@
+.thread {
+  border-right: 1px solid var(--gray-3);
+  border-left: 1px solid var(--gray-3);
+}
+
+.articleCard {
+  border: none;
+  border-bottom: 1px solid var(--gray-4);
+  border-radius: 0;
+  padding: 16px;
+  box-shadow: none;
+}
+
+.divider {
+  display: flex;
+  gap: 12px;
+}
+
+.content {
+  width: 100%;
+}
+
+.imageSkeleton {
+  position: relative;
+  width: 140px;
+  height: 180px;
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+}
