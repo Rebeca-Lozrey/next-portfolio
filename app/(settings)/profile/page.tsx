@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-
 import { Avatar, Box, Card, Flex, Heading, Text } from "@radix-ui/themes";
 
 import { getCurrentUser } from "@/lib/modules/auth/auth.service";
@@ -10,7 +8,7 @@ export default async function ProfilePage() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login");
+    throw new Error("User should exist in protected route");
   }
 
   return (
