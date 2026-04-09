@@ -3,19 +3,17 @@
 import { useEffect, useRef } from "react";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { ErrorBoundary } from "react-error-boundary";
 
 import { getArticles } from "@/lib/modules/articles/articles.api";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
 import { ArticlesPage } from "@/lib/modules/articles/articles.types";
 
+import Fallback from "../Fallback";
 import ArticleBlock from "./ArticleBlock";
 import styles from "./ArticlesList.module.css";
 
-export default function ArticlesList({
-  initialPage,
-}: {
-  initialPage: ArticlesPage;
-}) {
+function ArticlesListRaw({ initialPage }: { initialPage: ArticlesPage }) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isError } =
     useInfiniteQuery({
@@ -75,5 +73,17 @@ export default function ArticlesList({
         </div>
       )}
     </section>
+  );
+}
+
+export default function ArticlesList({
+  initialPage,
+}: {
+  initialPage: ArticlesPage;
+}) {
+  return (
+    <ErrorBoundary FallbackComponent={Fallback}>
+      <ArticlesListRaw initialPage={initialPage} />
+    </ErrorBoundary>
   );
 }

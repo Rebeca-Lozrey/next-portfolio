@@ -3,12 +3,13 @@ import Link from "next/link";
 
 import { PersonIcon } from "@radix-ui/react-icons";
 import { DropdownMenu, IconButton, Text } from "@radix-ui/themes";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
 import { useUser } from "@/providers/UserProvider";
 
 import LogoutButton from "./LogoutButton";
 
-export default function UserMenu() {
+function UserMenuRaw() {
   const user = useUser();
   const isAuthenticated = !!user;
 
@@ -54,5 +55,27 @@ export default function UserMenu() {
         )}
       </DropdownMenu.Content>
     </DropdownMenu.Root>
+  );
+}
+
+function Fallback({ error, resetErrorBoundary }: FallbackProps) {
+  return (
+    <IconButton
+      color="red"
+      variant="outline"
+      highContrast
+      onClick={resetErrorBoundary}
+      title="Retry"
+    >
+      <PersonIcon />
+    </IconButton>
+  );
+}
+
+export default function UserMenu() {
+  return (
+    <ErrorBoundary FallbackComponent={Fallback}>
+      <UserMenuRaw />
+    </ErrorBoundary>
   );
 }

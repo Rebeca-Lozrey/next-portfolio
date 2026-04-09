@@ -5,15 +5,17 @@ import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
 import { Avatar, Button, Callout, TextArea } from "@radix-ui/themes";
 import { useMutation } from "@tanstack/react-query";
+import { ErrorBoundary } from "react-error-boundary";
 
 import ImageUploadButton from "@/components/ArticleForm/ImageUploadButton";
 import { uploadImage } from "@/lib/cloudinary/uploadImage";
 import { useCreateArticleMutation } from "@/lib/modules/articles/hooks/useCreateArticleMutation";
 import { useUser } from "@/providers/UserProvider";
 
+import Fallback from "../Fallback";
 import styles from "./ArticleForm.module.css";
 
-export default function ArticleForm() {
+function ArticleFormRaw() {
   const [uploaded, setUploaded] = useState<string | undefined>(undefined);
   const [preview, setPreview] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
@@ -142,5 +144,13 @@ export default function ArticleForm() {
         </div>
       </Form.Root>
     </section>
+  );
+}
+
+export default function ArticleForm() {
+  return (
+    <ErrorBoundary FallbackComponent={Fallback}>
+      <ArticleFormRaw />
+    </ErrorBoundary>
   );
 }

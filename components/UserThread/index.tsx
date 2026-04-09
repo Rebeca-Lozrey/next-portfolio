@@ -3,6 +3,7 @@
 import { useRef } from "react";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { ErrorBoundary } from "react-error-boundary";
 
 import { getMyArticles } from "@/lib/modules/articles/articles.api";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
@@ -10,14 +11,11 @@ import { ArticlesPage } from "@/lib/modules/articles/articles.types";
 
 import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import EmptyListMessage from "../EmptyListMessage";
+import Fallback from "../Fallback";
 import ArticleBlock from "./ArticleBlock";
 import styles from "./UserThread.module.css";
 
-export default function UserThread({
-  initialPage,
-}: {
-  initialPage: ArticlesPage;
-}) {
+function UserThreadRaw({ initialPage }: { initialPage: ArticlesPage }) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isError } =
     useInfiniteQuery({
       queryKey: articlesKeys.myArticles,
@@ -70,5 +68,17 @@ export default function UserThread({
         </div>
       )}
     </section>
+  );
+}
+
+export default function UserThread({
+  initialPage,
+}: {
+  initialPage: ArticlesPage;
+}) {
+  return (
+    <ErrorBoundary FallbackComponent={Fallback}>
+      <UserThreadRaw initialPage={initialPage} />
+    </ErrorBoundary>
   );
 }
