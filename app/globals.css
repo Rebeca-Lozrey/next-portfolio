@@ -60,7 +60,7 @@ body {
   max-width: var(--container-width);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 230px 1fr 230px;
+  grid-template-columns: 1fr 640px 1fr;
   min-height: 1vh;
 }
 
@@ -77,30 +77,7 @@ body {
    Responsive
 -------------------------------- */
 
-@media (min-width: 520px) and (max-width: 1024px) {
-  .topbar-inner {
-    padding: 12px 18px;
-  }
-
-  .site-content {
-    padding: 10px 18px;
-  }
-
-  .layout {
-    display: grid;
-    grid-template-columns: 130px 1fr 130px;
-  }
-}
-
-@media (max-width: 519px) {
-  .topbar-inner {
-    padding: 12px 0;
-  }
-
-  .site-content {
-    padding: 10px 0;
-  }
-
+@media (max-width: 640px) {
   .layout {
     grid-template-columns: 1fr;
   }
@@ -111,5 +88,8 @@ body {
 
   .sidebar-right {
     display: none;
+  }
+  .site-content {
+    padding: 10px 2px;
   }
 }

@@ -79,3 +79,11 @@
   font-size: var(--font-size-1);
   color: var(--gray-6);
 }
+
+.avatarImage {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  overflow: hidden;
+}

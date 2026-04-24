@@ -1,0 +1,10 @@
+.dropdownMenuTrigger {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--radius-2);
+  border: 1px solid var(--gray-a11);
+  background-color: transparent;
+}

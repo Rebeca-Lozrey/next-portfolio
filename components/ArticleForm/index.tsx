@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 
+import NextImage from "next/image";
+
 import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
-import { Avatar, Button, Callout, TextArea } from "@radix-ui/themes";
+import { Button, Callout, TextArea } from "@radix-ui/themes";
 import { useMutation } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -67,12 +69,14 @@ function ArticleFormRaw() {
     <section className={root}>
       <Form.Root className={form} onSubmit={handleSubmit}>
         <div className={avatar}>
-          <Avatar
-            fallback={user?.username[0] || "U"}
-            radius="full"
-            size="3"
-            alt="My profile photo"
-          />
+          <div className={styles.avatarImage}>
+            <NextImage
+              src="https://res.cloudinary.com/dmpiaetro/image/upload/v1776984223/7b66703c-c159-4bb5-b3cb-bef5bc445668.png"
+              alt="Profile Image"
+              fill
+              sizes="32px"
+            />
+          </div>
         </div>
         <div className={fields}>
           <Form.Field name="content">
@@ -89,6 +93,7 @@ function ArticleFormRaw() {
                 maxLength={280}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
+                id="article-form-text-area-home-page"
               />
             </Form.Control>
 

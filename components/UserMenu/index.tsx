@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 
 import { PersonIcon } from "@radix-ui/react-icons";
@@ -8,6 +9,7 @@ import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { useUser } from "@/providers/UserProvider";
 
 import LogoutButton from "./LogoutButton";
+import styles from "./UserMenu.module.css";
 
 function UserMenuRaw() {
   const user = useUser();
@@ -16,9 +18,12 @@ function UserMenuRaw() {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <IconButton color="gray" variant="outline" highContrast>
+        <div
+          className={styles.dropdownMenuTrigger}
+          id="user-menu-trigger-top-bar"
+        >
           <PersonIcon />
-        </IconButton>
+        </div>
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content align="end">

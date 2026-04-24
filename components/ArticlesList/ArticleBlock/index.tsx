@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import { Avatar } from "@radix-ui/themes";
-
 import LikeButton from "@/components/LikeButton";
 import type { Article } from "@/lib/modules/articles/articles.types";
 
@@ -23,17 +21,25 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
     id,
   } = article;
 
+  const date = new Date(createdAt);
+  const formatted = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+
   return (
     <article className={styles.article}>
       <header className={styles.header}>
         <div className={styles.author}>
-          <Avatar fallback={authorUsername[0]} radius="full" size="2" />
+          <div className={styles.avatarImage}>
+            <Image
+              src="https://res.cloudinary.com/dmpiaetro/image/upload/v1776984223/7b66703c-c159-4bb5-b3cb-bef5bc445668.png"
+              alt="Profile Image"
+              fill
+              sizes="32px"
+            />
+          </div>
           <span className={styles.username}>{authorUsername}</span>
         </div>
 
-        <span className={styles.date}>
-          {new Date(createdAt).toLocaleDateString()}
-        </span>
+        <span className={styles.date}>{formatted}</span>
       </header>
 
       <p className={styles.content}>{content}</p>
@@ -45,9 +51,8 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
             src={imageUrl}
             alt="Article Image"
             fill
-            sizes="(max-width: 768px) 100vw, 640px"
+            sizes="640px"
             style={{ objectFit: "cover" }}
-            unoptimized={true}
           />
         </div>
       )}
@@ -55,7 +60,7 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
         <span className={styles.likesCount}>{likeCount} likes</span>
 
         <div className={styles.rightActions}>
-          <LikeButton articleId={id} likedByUser={likedByUser} />
+          <LikeButton articleId={id} likedByUser={likedByUser} term={null} />
         </div>
       </footer>
     </article>

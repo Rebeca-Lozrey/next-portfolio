@@ -5,9 +5,9 @@ import { getMyArticlesPage } from "@/lib/modules/articles/articles.service";
 import { mongoLikesRepository } from "@/lib/modules/likes/likes.repository";
 
 export async function GET(req: NextRequest) {
-  try {
-    const cursor = req.nextUrl.searchParams.get("cursor") ?? null;
+  const cursor = req.nextUrl.searchParams.get("cursor");
 
+  try {
     const page = await getMyArticlesPage(
       mongoArticlesRepository,
       mongoLikesRepository,
