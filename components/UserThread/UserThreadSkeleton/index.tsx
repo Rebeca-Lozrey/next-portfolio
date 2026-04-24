@@ -39,6 +39,7 @@ export default function UserThreadSkeleton() {
     <section className={styles.thread} aria-busy="true" aria-live="polite">
       <MyArticleCardSkeleton />
       <MyArticleCardSkeleton />
+      <MyArticleCardSkeleton />
     </section>
   );
 }

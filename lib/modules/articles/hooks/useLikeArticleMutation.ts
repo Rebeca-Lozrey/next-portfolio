@@ -32,7 +32,7 @@ const optimisticUpdate =
     };
   };
 
-export default function useLikeArticleMutation() {
+export default function useLikeArticleMutation(term: string | null) {
   const queryClient = useQueryClient();
 
   const likeMutation = useMutation({
@@ -43,13 +43,13 @@ export default function useLikeArticleMutation() {
 
       const snapshot = {
         all: queryClient.getQueryData(articlesKeys.all),
-        myArticles: queryClient.getQueryData(articlesKeys.myArticles),
+        myArticles: queryClient.getQueryData(articlesKeys.myArticles(term)),
       };
 
       queryClient.setQueryData(articlesKeys.all, optimisticUpdate(articleId));
 
       queryClient.setQueryData(
-        articlesKeys.myArticles,
+        articlesKeys.myArticles(term),
         optimisticUpdate(articleId),
       );
 
@@ -61,7 +61,10 @@ export default function useLikeArticleMutation() {
         queryClient.setQueryData(articlesKeys.all, context.all);
       }
       if (context?.myArticles) {
-        queryClient.setQueryData(articlesKeys.myArticles, context.myArticles);
+        queryClient.setQueryData(
+          articlesKeys.myArticles(term),
+          context.myArticles,
+        );
       }
       console.error("Failed to publish article");
     },

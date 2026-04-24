@@ -7,26 +7,32 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import { getArticles } from "@/lib/modules/articles/articles.api";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
-import { ArticlesPage } from "@/lib/modules/articles/articles.types";
+import { ArticlesPage, Cursor } from "@/lib/modules/articles/articles.types";
 
+import EmptyListMessage from "../EmptyListMessage";
 import Fallback from "../Fallback";
 import ArticleBlock from "./ArticleBlock";
 import styles from "./ArticlesList.module.css";
 
 function ArticlesListRaw({ initialPage }: { initialPage: ArticlesPage }) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isError } =
-    useInfiniteQuery({
-      queryKey: articlesKeys.all,
-      queryFn: ({ pageParam }: { pageParam: string | null }) =>
-        getArticles(pageParam),
-      initialPageParam: null,
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-      initialData: {
-        pages: [initialPage],
-        pageParams: [null],
-      },
-    });
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isError,
+  } = useInfiniteQuery({
+    queryKey: articlesKeys.all,
+    queryFn: ({ pageParam }: { pageParam: Cursor }) => getArticles(pageParam),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    initialData: {
+      pages: [initialPage],
+      pageParams: [null],
+    },
+  });
 
   useEffect(() => {
     const el = loadMoreRef.current;
@@ -49,18 +55,29 @@ function ArticlesListRaw({ initialPage }: { initialPage: ArticlesPage }) {
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+  const isInitialLoading = isFetching && !data?.pages?.[0]?.articles.length;
+  const hasNoArticles = !isInitialLoading && !data?.pages?.[0]?.articles.length;
+
+  const results = data?.pages.map((page) =>
+    page.articles.map((article, index) => {
+      return (
+        <ArticleBlock
+          key={article.id}
+          article={article}
+          priority={index === 0}
+        />
+      );
+    }),
+  );
+
   return (
     <section className={styles.feed}>
-      {data?.pages.map((page) =>
-        page.articles.map((article, index) => {
-          return (
-            <ArticleBlock
-              key={article.id}
-              article={article}
-              priority={index === 0}
-            />
-          );
-        }),
+      {isInitialLoading ? (
+        <p>Loading articles...</p>
+      ) : hasNoArticles ? (
+        <EmptyListMessage message="There's no published articles yet." />
+      ) : (
+        results
       )}
 
       <div ref={loadMoreRef} />

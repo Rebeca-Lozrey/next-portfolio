@@ -13,6 +13,12 @@ export interface ArticleDocument {
   createdAt: Date;
 }
 
+export type ArticleDocumentWithSort = ArticleDocument & {
+  score: number;
+  searchAfter: string;
+  meta: 
+};
+
 export interface Article {
   id: string;
   authorId: string;
@@ -24,14 +30,18 @@ export interface Article {
   createdAt: Date;
 }
 
+export type Cursor = string | null;
+
 export interface ArticlesDocumentPage {
   articles: ArticleDocument[];
-  nextCursor: string | null;
+  total: number | null;
+  nextCursor: Cursor;
 }
 
 export interface ArticlesPage {
   articles: Article[];
-  nextCursor: string | null;
+  total: number | null;
+  nextCursor: Cursor;
 }
 
 export type CreateArticleRequest = z.infer<typeof createArticleSchema>;

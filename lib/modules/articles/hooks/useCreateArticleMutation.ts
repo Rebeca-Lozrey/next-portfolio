@@ -41,7 +41,7 @@ export const useCreateArticleMutation = (
 
       const snapshot = {
         all: queryClient.getQueryData(articlesKeys.all),
-        myArticles: queryClient.getQueryData(articlesKeys.myArticles),
+        myArticles: queryClient.getQueryData(articlesKeys.myArticles(null)),
       };
 
       const tempId = crypto.randomUUID();
@@ -63,7 +63,7 @@ export const useCreateArticleMutation = (
       );
 
       queryClient.setQueryData(
-        articlesKeys.myArticles,
+        articlesKeys.myArticles(null),
         optimisticUpdate(optimisticArticle),
       );
       return snapshot;
@@ -74,7 +74,10 @@ export const useCreateArticleMutation = (
         queryClient.setQueryData(articlesKeys.all, context.all);
       }
       if (context?.myArticles) {
-        queryClient.setQueryData(articlesKeys.myArticles, context.myArticles);
+        queryClient.setQueryData(
+          articlesKeys.myArticles(null),
+          context.myArticles,
+        );
       }
       console.error("Failed to delete article");
     },

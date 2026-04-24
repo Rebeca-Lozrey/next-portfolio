@@ -1,9 +1,9 @@
 import {
-  MongoClient,
-  ServerApiVersion,
-  Db,
   Collection,
+  Db,
+  MongoClient,
   Document as MongoDocument,
+  ServerApiVersion,
 } from "mongodb";
 
 function getUri() {
@@ -17,7 +17,7 @@ function getUri() {
 const options = {
   serverApi: {
     version: ServerApiVersion.v1,
-    strict: true,
+    // strict: true,
     deprecationErrors: true,
   },
 };

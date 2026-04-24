@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 import { getCurrentUser } from "../auth/auth.service";
 import { LikesRepository } from "../likes/likes.repository";
 import { type ArticlesRepository } from "./articles.repository";
@@ -8,6 +6,7 @@ import type {
   ArticleDocument,
   ArticlesPage,
   CreateArticleRequest,
+  Cursor,
 } from "./articles.types";
 
 export async function createArticleService(
@@ -37,7 +36,7 @@ export async function createArticleService(
 export async function getArticlesPage(
   articlesRepo: ArticlesRepository,
   likesRepo: LikesRepository,
-  cursor: string | null,
+  cursor: Cursor,
 ): Promise<ArticlesPage> {
   const user = await getCurrentUser();
   const rawPage = await articlesRepo.infiniteByCursor(cursor);
@@ -59,6 +58,7 @@ export async function getArticlesPage(
       likedByUser: likedSet.has(ArticleDocument._id.toString()),
       createdAt: ArticleDocument.createdAt,
     })),
+    total: null,
     nextCursor: rawPage.nextCursor,
   };
   return page;
@@ -67,7 +67,7 @@ export async function getArticlesPage(
 export async function getMyArticlesPage(
   articlesRepo: ArticlesRepository,
   likesRepo: LikesRepository,
-  cursor: string | null,
+  cursor: Cursor,
 ): Promise<ArticlesPage> {
   const user = await getCurrentUser();
 
@@ -91,6 +91,7 @@ export async function getMyArticlesPage(
       likedByUser: likedSet.has(doc._id.toString()),
       createdAt: doc.createdAt,
     })),
+    total: rawPage.total,
     nextCursor: rawPage.nextCursor,
   };
 
@@ -107,13 +108,48 @@ export async function deleteArticleService(
     throw new Error("UNAUTHORIZED");
   }
 
-  if (!ObjectId.isValid(articleId)) {
-    throw new Error("INVALID_ID");
-  }
-
   const deleted = await repo.deleteByIdAndAuthor(articleId, user.id);
 
   if (!deleted) {
     throw new Error("NOT_FOUND");
   }
+}
+
+export async function getMyArticlesByTermPage(
+  articlesRepo: ArticlesRepository,
+  likesRepo: LikesRepository,
+  term: string,
+  cursor: Cursor,
+): Promise<ArticlesPage> {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  const rawPage = await articlesRepo.infiniteByUserByTermCursor(
+    user.id,
+    term,
+    cursor,
+  );
+
+  const likes = await likesRepo.findByUser(user.id);
+  const likedSet = new Set(likes.map((l) => l.articleId));
+
+  const page: ArticlesPage = {
+    articles: rawPage.articles.map((doc) => ({
+      id: doc._id.toString(),
+      authorId: doc.authorId,
+      authorUsername: doc.authorUsername,
+      content: doc.content,
+      imageUrl: doc.imageUrl,
+      likeCount: doc.likeCount,
+      likedByUser: likedSet.has(doc._id.toString()),
+      createdAt: doc.createdAt,
+    })),
+    total: rawPage.total,
+    nextCursor: rawPage.nextCursor,
+  };
+
+  return page;
 }

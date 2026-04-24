@@ -7,11 +7,13 @@ import styles from "./LikeButton.module.css";
 export default function LikeButton({
   articleId,
   likedByUser,
+  term,
 }: {
   articleId: string;
   likedByUser: boolean;
+  term: string | null;
 }) {
-  const likeMutation = useLikeArticleMutation();
+  const likeMutation = useLikeArticleMutation(term);
   return (
     <IconButton
       size="3"

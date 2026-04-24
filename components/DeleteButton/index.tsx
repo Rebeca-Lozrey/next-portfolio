@@ -4,8 +4,14 @@ import useDeleteArticleMutation from "@/lib/modules/articles/hooks/useDeleteArti
 
 import styles from "./DeleteButton.module.css";
 
-export default function DeleteButton({ articleId }: { articleId: string }) {
-  const deleteMutation = useDeleteArticleMutation();
+export default function DeleteButton({
+  articleId,
+  term,
+}: {
+  articleId: string;
+  term: string | null;
+}) {
+  const deleteMutation = useDeleteArticleMutation(term);
   return (
     <Button
       size="3"

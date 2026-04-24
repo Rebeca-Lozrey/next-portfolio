@@ -9,9 +9,14 @@ import styles from "./ArticleBlock.module.css";
 interface ArticleBlockProps {
   article: Article;
   priority: boolean;
+  term: string | null;
 }
 
-export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
+export default function ArticleBlock({
+  article,
+  priority,
+  term,
+}: ArticleBlockProps) {
   const { content, imageUrl, createdAt, likedByUser, likeCount, id } = article;
 
   return (
@@ -29,9 +34,8 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
               src={imageUrl}
               alt="Article Image"
               fill
-              sizes="(max-width: 768px) 100vw, 140px"
+              sizes="256px"
               style={{ objectFit: "cover" }}
-              unoptimized={true}
             />
           </div>
         )}
@@ -41,8 +45,8 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
       <footer className={styles.actions}>
         <span className={styles.likesCount}>{likeCount} likes</span>
         <div className={styles.rightActions}>
-          <DeleteButton articleId={id} />
-          <LikeButton articleId={id} likedByUser={likedByUser} />
+          <DeleteButton articleId={id} term={term} />
+          <LikeButton articleId={id} likedByUser={likedByUser} term={term} />
         </div>
       </footer>
     </article>
