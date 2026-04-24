@@ -16,7 +16,7 @@ export interface ArticleDocument {
 export type ArticleDocumentWithSort = ArticleDocument & {
   score: number;
   searchAfter: string;
-  meta: 
+  meta: { count: { total: number } };
 };
 
 export interface Article {
