@@ -74,7 +74,7 @@ function ArticleFormRaw() {
               src="https://res.cloudinary.com/dmpiaetro/image/upload/v1776984223/7b66703c-c159-4bb5-b3cb-bef5bc445668.png"
               alt="Profile Image"
               fill
-              sizes="32px"
+              sizes="38px"
             />
           </div>
         </div>

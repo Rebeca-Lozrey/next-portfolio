@@ -18,12 +18,16 @@ function UserMenuRaw() {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <div
-          className={styles.dropdownMenuTrigger}
+        <IconButton
           id="user-menu-trigger-top-bar"
+          aria-label="Toggle user menu open or close"
+          color="gray"
+          variant="outline"
+          highContrast
+          size="2"
         >
           <PersonIcon />
-        </div>
+        </IconButton>
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content align="end">

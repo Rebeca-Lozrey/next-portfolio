@@ -27,8 +27,45 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nextjs Portfolio",
-  description: "Typescript Vitest React Query",
+  title: {
+    default: "Next.js Portfolio",
+    template: "%s | Next.js Portfolio",
+  },
+  description:
+    "Portfolio showcasing modern web development with Next.js, TypeScript, React Query, and scalable frontend architecture.",
+
+  metadataBase: new URL("https://next-portfolio-blush-psi.vercel.app/"),
+
+  openGraph: {
+    title: "Next.js Portfolio",
+    description:
+      "Explore projects built with Next.js, TypeScript, and React Query.",
+    url: "https://next-portfolio-blush-psi.vercel.app/",
+    siteName: "Next.js Portfolio",
+    images: [
+      {
+        url: "/open_graph_social_image.png",
+        width: 1200,
+        height: 630,
+        alt: "Next.js Portfolio Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Next.js Portfolio",
+    description:
+      "Projects built with Next.js, TypeScript, and modern frontend tools.",
+    images: ["/open_graph_social_image.png"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default async function RootLayout({

@@ -18,6 +18,7 @@ export default function ThemeButton() {
       highContrast
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className={themeButton}
+      aria-label="Switch theme mode between dark and light"
     >
       <SunIcon className={sunIcon} />
       <MoonIcon className={moonIcon} />
