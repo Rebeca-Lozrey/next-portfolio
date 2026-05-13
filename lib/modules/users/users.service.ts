@@ -3,9 +3,10 @@ import {
   isDuplicateKeyError,
 } from "@/lib/shared/mongo.utils";
 
+import { mongoArticlesRepository } from "../articles/articles.repository";
 import { hashPassword } from "../auth/password";
 import type { UsersRepository } from "./users.repository";
-import type { User } from "./users.types";
+import type { UpdateUserInput, User } from "./users.types";
 import type { CreateUserInput } from "./users.types";
 
 export async function createUser(
@@ -24,6 +25,7 @@ export async function createUser(
     username: input.username,
     passwordHash,
     createdAt: new Date(),
+    avatar: null,
   };
 
   try {
@@ -45,6 +47,21 @@ export async function createUser(
 
     throw error;
   }
+}
+
+export async function updateUser(
+  repo: UsersRepository,
+  id: string,
+  updates: UpdateUserInput,
+): Promise<User | null> {
+  const updated = await repo.updateById(id, updates);
+
+  if (!updated) {
+    throw new Error("Failed to update user");
+  }
+
+  await mongoArticlesRepository.updateByAuthorId(id, updates);
+  return updated;
 }
 
 export async function getUserById(repo: UsersRepository, userId: string) {

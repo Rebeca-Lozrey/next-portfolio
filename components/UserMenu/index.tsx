@@ -4,15 +4,20 @@ import Link from "next/link";
 
 import { PersonIcon } from "@radix-ui/react-icons";
 import { DropdownMenu, IconButton, Text } from "@radix-ui/themes";
+import { useQuery } from "@tanstack/react-query";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
-import { useUser } from "@/providers/UserProvider";
+import { fetchCurrentUser } from "@/lib/modules/users/users.api";
+import { usersKeys } from "@/lib/modules/users/users.keys";
 
 import LogoutButton from "./LogoutButton";
-import styles from "./UserMenu.module.css";
 
 function UserMenuRaw() {
-  const user = useUser();
+  const { data: user, isPending } = useQuery({
+    queryKey: usersKeys.current,
+    queryFn: () => fetchCurrentUser(),
+    throwOnError: true,
+  });
   const isAuthenticated = !!user;
 
   return (
@@ -31,7 +36,7 @@ function UserMenuRaw() {
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content align="end">
-        {isAuthenticated ? (
+        {isAuthenticated && !isPending ? (
           <>
             <DropdownMenu.Label>
               <Text size="2">{user.username}</Text>

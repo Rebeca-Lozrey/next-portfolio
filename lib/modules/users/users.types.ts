@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import z from "zod";
 
-import { createUserSchema } from "./users.schema";
+import { createUserSchema, updateUserSchema } from "./users.schema";
 
 export interface User {
   id: string;
@@ -9,6 +9,7 @@ export interface User {
   username: string;
   passwordHash: string;
   createdAt: Date;
+  avatar: string | null;
 }
 
 export interface UserDocument {
@@ -17,6 +18,8 @@ export interface UserDocument {
   username: string;
   passwordHash: string;
   createdAt: Date;
+  avatar: string | null;
 }
 
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type CreateUserInput = z.infer<typeof createUserSchema>;

@@ -21,6 +21,10 @@ const optimisticUpdate =
         {
           ...old.pages[0],
           articles: [optimisticArticle, ...old.pages[0].articles],
+          total:
+            typeof old.pages[0].total === "number"
+              ? old.pages[0].total + 1
+              : null,
         },
         ...old.pages.slice(1),
       ],
@@ -37,6 +41,9 @@ export const useCreateArticleMutation = (
     mutationFn: createArticle,
 
     onMutate: async (newArticleInput) => {
+      if (!user) {
+        throw new Error("User must be defined");
+      }
       await queryClient.cancelQueries({ queryKey: articlesKeys.all });
 
       const snapshot = {
@@ -48,7 +55,10 @@ export const useCreateArticleMutation = (
 
       const optimisticArticle = {
         ...newArticleInput,
-        authorUsername: user?.username || "",
+        author: {
+          username: user?.username,
+          avatar: user?.avatar || null,
+        },
         authorId: user?.id || "",
         id: tempId,
         imageUrl: uploaded ? uploaded : null,

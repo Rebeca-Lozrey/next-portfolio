@@ -80,7 +80,7 @@ export default async function RootLayout({
         <ThemeProvider attribute="class">
           <Theme>
             <QueryProvider>
-              <UserProvider user={user}>
+              <UserProvider initialUser={user}>
                 <header className="topbar">
                   <div className="topbar-inner">
                     <Link href="/">

@@ -2,6 +2,7 @@ import { ObjectId, OptionalId } from "mongodb";
 
 import { getCollection } from "@/lib/mongodb";
 
+import { UpdateUserInput } from "../users/users.types";
 import type {
   ArticleDocument,
   ArticleDocumentWithSort,
@@ -18,15 +19,19 @@ export interface ArticlesRepository {
   decrementLikes(articleId: string): Promise<void>;
   incrementLikes(articleId: string): Promise<void>;
   infiniteByUserCursor(
-    userId: string,
+    authorId: string,
     cursor: Cursor,
   ): Promise<ArticlesDocumentPage>;
-  deleteByIdAndAuthor(id: string, authorId: string): Promise<boolean>;
+  deleteByIdAndAuthor(
+    id: string,
+    authorId: string,
+  ): Promise<ArticleDocument | null>;
   infiniteByUserByTermCursor(
-    userId: string,
+    authorId: string,
     term: string,
     cursor: Cursor,
   ): Promise<ArticlesDocumentPage>;
+  updateByAuthorId(authorId: string, updates: UpdateUserInput): Promise<number>;
 }
 
 export const mongoArticlesRepository: ArticlesRepository = {
@@ -88,12 +93,12 @@ export const mongoArticlesRepository: ArticlesRepository = {
     );
   },
 
-  async infiniteByUserCursor(userId, cursor) {
+  async infiniteByUserCursor(authorId, cursor) {
     const collection = await getCollection<ArticleDocument>(COLLECTION_NAME);
     const LIMIT = 10;
 
     const query = {
-      authorId: userId,
+      authorId: new ObjectId(authorId),
       ...(cursor && { _id: { $lt: new ObjectId(cursor) } }),
     };
 
@@ -108,7 +113,7 @@ export const mongoArticlesRepository: ArticlesRepository = {
 
     const total = cursor
       ? null
-      : await collection.countDocuments({ authorId: userId });
+      : await collection.countDocuments({ authorId: new ObjectId(authorId) });
 
     return {
       articles,
@@ -121,14 +126,14 @@ export const mongoArticlesRepository: ArticlesRepository = {
 
   async deleteByIdAndAuthor(id, authorId) {
     const collection = await getCollection<ArticleDocument>(COLLECTION_NAME);
-    const result = await collection.deleteOne({
+    const result = await collection.findOneAndDelete({
       _id: new ObjectId(id),
-      authorId,
+      authorId: new ObjectId(authorId),
     });
-    return result.deletedCount === 1;
+    return result;
   },
 
-  async infiniteByUserByTermCursor(userId, term, cursor) {
+  async infiniteByUserByTermCursor(authorId, term, cursor) {
     const collection = await getCollection<ArticleDocument>(COLLECTION_NAME);
     // ======================
     // SEARCH MODE (Atlas)
@@ -144,15 +149,15 @@ export const mongoArticlesRepository: ArticlesRepository = {
     };
 
     const authorIdFilter = {
-      term: {
-        query: userId,
+      equals: {
+        value: new ObjectId(authorId),
         path: "authorId",
       },
     };
 
     const scoreAndIdSort = {
       score: { $meta: "searchScore" },
-      _id: 1,
+      _id: -1,
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -179,7 +184,7 @@ export const mongoArticlesRepository: ArticlesRepository = {
         $project: {
           _id: 1,
           authorId: 1,
-          authorUsername: 1,
+          author: 1,
           content: 1,
           imageUrl: 1,
           likeCount: 1,
@@ -209,5 +214,28 @@ export const mongoArticlesRepository: ArticlesRepository = {
         ? articles[articles.length - 1].searchAfter
         : null,
     };
+  },
+
+  async updateByAuthorId(authorId, updates) {
+    const collection =
+      await getCollection<OptionalId<ArticleDocument>>(COLLECTION_NAME);
+
+    const setFields: Record<string, unknown> = {};
+
+    if (updates.username !== undefined) {
+      setFields["author.username"] = updates.username;
+    }
+
+    if (updates.avatar !== undefined) {
+      setFields["author.avatar"] = updates.avatar;
+    }
+
+    const result = await collection.updateMany(
+      { authorId: new ObjectId(authorId) },
+      {
+        $set: setFields,
+      },
+    );
+    return result.modifiedCount;
   },
 };

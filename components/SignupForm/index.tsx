@@ -1,32 +1,57 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { SubmitEvent, useState } from "react";
+
+import { useRouter } from "next/navigation";
 
 import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
 import { Callout } from "@radix-ui/themes";
 import { Button, Text, TextField } from "@radix-ui/themes";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { FormAction } from "@/lib/types/actions";
+import { signup } from "@/lib/modules/auth/auth.api";
+import { SignupDTO } from "@/lib/modules/auth/auth.types";
+import { usersKeys } from "@/lib/modules/users/users.keys";
 
 import styles from "./SignupForm.module.css";
 
-export default function SignupForm({ action }: { action: FormAction }) {
-  const [state, formAction, pending] = useActionState(action, {
-    message: null,
-    error: null,
+export default function SignupForm() {
+  const [isDirty, setIsDirty] = useState(false);
+
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const submitMutation = useMutation({
+    mutationFn: (dto: SignupDTO) => signup(dto),
+
+    onError: (_err, _vars) => {
+      console.error("Failed signing up");
+    },
+
+    onSuccess: (data) => {
+      queryClient.setQueryData(usersKeys.current, data);
+      router.push("/my-articles");
+    },
   });
 
-  const [isDirty, setIsDirty] = useState(false);
+  const { isPending, isError, error } = submitMutation;
+
+  const handleOnSubmit = (e: SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsDirty(false);
+
+    const formData = new FormData(e.currentTarget);
+    submitMutation.mutate({
+      email: formData.get("email") as string,
+      username: formData.get("username") as string,
+      password: formData.get("password") as string,
+    });
+  };
 
   const { root, form, fields, inline, title, subtitle, message } = styles;
   return (
     <div className={root}>
-      <Form.Root
-        className={form}
-        action={formAction}
-        onSubmit={() => setIsDirty(false)}
-      >
+      <Form.Root className={form} onSubmit={handleOnSubmit}>
         <div className={title}>Sign Up</div>
         <div className={subtitle}>Create your account</div>
         <div className={fields}>
@@ -106,22 +131,22 @@ export default function SignupForm({ action }: { action: FormAction }) {
             </Form.Message>
           </Form.Field>
           <div>
-            {state.error && !isDirty && !pending && (
+            {isError && !isDirty && !isPending && (
               <Callout.Root size="1" color="red" role="alert">
                 <Callout.Icon>
                   <CrossCircledIcon />
                 </Callout.Icon>
-                <Callout.Text>{state.error}</Callout.Text>
+                <Callout.Text>{error.message}</Callout.Text>
               </Callout.Root>
             )}
           </div>
           <div className={inline}>
             <Form.Submit asChild>
               <Button
-                disabled={pending}
-                color={state.error && !isDirty && !pending ? "red" : "blue"}
+                disabled={isPending}
+                color={isError && !isDirty && !isPending ? "red" : "blue"}
               >
-                {pending ? "Signing Up..." : "Sign Up"}
+                {isPending ? "Signing Up..." : "Sign Up"}
               </Button>
             </Form.Submit>
           </div>

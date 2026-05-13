@@ -1,3 +1,8 @@
+import { ObjectId } from "mongodb";
+
+import cloudinary from "@/lib/cloudinary";
+import { extractPublicId } from "@/lib/cloudinary/cloudinary.utils";
+
 import { getCurrentUser } from "../auth/auth.service";
 import { LikesRepository } from "../likes/likes.repository";
 import { type ArticlesRepository } from "./articles.repository";
@@ -20,8 +25,8 @@ export async function createArticleService(
   }
 
   const article: Omit<ArticleDocument, "_id"> = {
-    authorId: user.id,
-    authorUsername: user.username,
+    authorId: new ObjectId(user.id),
+    author: { username: user.username, avatar: user.avatar },
     content: input.content,
     imageUrl: input.imageUrl ?? null,
     likeCount: 0,
@@ -50,8 +55,11 @@ export async function getArticlesPage(
   const page: ArticlesPage = {
     articles: rawPage.articles.map((ArticleDocument) => ({
       id: ArticleDocument._id.toString(),
-      authorId: ArticleDocument.authorId,
-      authorUsername: ArticleDocument.authorUsername,
+      authorId: ArticleDocument.authorId.toString(),
+      author: {
+        username: ArticleDocument.author.username,
+        avatar: ArticleDocument.author.avatar,
+      },
       content: ArticleDocument.content,
       imageUrl: ArticleDocument.imageUrl,
       likeCount: ArticleDocument.likeCount,
@@ -83,8 +91,8 @@ export async function getMyArticlesPage(
   const page: ArticlesPage = {
     articles: rawPage.articles.map((doc) => ({
       id: doc._id.toString(),
-      authorId: doc.authorId,
-      authorUsername: doc.authorUsername,
+      authorId: doc.authorId.toString(),
+      author: { username: doc.author.username, avatar: doc.author.avatar },
       content: doc.content,
       imageUrl: doc.imageUrl,
       likeCount: doc.likeCount,
@@ -108,10 +116,20 @@ export async function deleteArticleService(
     throw new Error("UNAUTHORIZED");
   }
 
-  const deleted = await repo.deleteByIdAndAuthor(articleId, user.id);
+  const deletedArticle = await repo.deleteByIdAndAuthor(articleId, user.id);
 
-  if (!deleted) {
+  if (!deletedArticle) {
     throw new Error("NOT_FOUND");
+  }
+
+  if (deletedArticle.imageUrl) {
+    const publicId = extractPublicId(deletedArticle.imageUrl);
+
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId, {
+        invalidate: true,
+      });
+    }
   }
 }
 
@@ -139,8 +157,8 @@ export async function getMyArticlesByTermPage(
   const page: ArticlesPage = {
     articles: rawPage.articles.map((doc) => ({
       id: doc._id.toString(),
-      authorId: doc.authorId,
-      authorUsername: doc.authorUsername,
+      authorId: doc.authorId.toString(),
+      author: { username: doc.author.username, avatar: doc.author.avatar },
       content: doc.content,
       imageUrl: doc.imageUrl,
       likeCount: doc.likeCount,

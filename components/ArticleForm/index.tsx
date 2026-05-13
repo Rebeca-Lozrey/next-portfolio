@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 
-import NextImage from "next/image";
-
 import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
-import { Button, Callout, TextArea } from "@radix-ui/themes";
+import { Avatar, Button, Callout, TextArea } from "@radix-ui/themes";
 import { useMutation } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -69,12 +67,13 @@ function ArticleFormRaw() {
     <section className={root}>
       <Form.Root className={form} onSubmit={handleSubmit}>
         <div className={avatar}>
-          <div className={styles.avatarImage}>
-            <NextImage
-              src="https://res.cloudinary.com/dmpiaetro/image/upload/v1776984223/7b66703c-c159-4bb5-b3cb-bef5bc445668.png"
-              alt="Profile Image"
-              fill
-              sizes="38px"
+          <div>
+            <Avatar
+              src={user?.avatar ? user?.avatar : undefined}
+              fallback={user?.username?.[0]?.toUpperCase() || "U"}
+              size="4"
+              radius="full"
+              aria-label="Upload avatar image"
             />
           </div>
         </div>

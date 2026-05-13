@@ -1,32 +1,52 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { SubmitEvent, useState } from "react";
+
+import { useRouter } from "next/navigation";
 
 import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
 import { Callout } from "@radix-ui/themes";
 import { Button, Text, TextField } from "@radix-ui/themes";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { FormAction } from "@/lib/types/actions";
+import { login } from "@/lib/modules/auth/auth.api";
+import { usersKeys } from "@/lib/modules/users/users.keys";
 
 import styles from "./LoginForm.module.css";
 
-export default function LoginForm({ action }: { action: FormAction }) {
-  const [state, formAction, pending] = useActionState(action, {
-    message: null,
-    error: null,
+export default function LoginForm() {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const loginMutation = useMutation({
+    mutationFn: login,
+
+    onSuccess: (data) => {
+      queryClient.setQueryData(usersKeys.current, data);
+      router.push("/my-articles");
+    },
   });
 
+  const { isPending, isError, error } = loginMutation;
+
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    setIsDirty(false);
+
+    loginMutation.mutate({
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+    });
+  };
   const [isDirty, setIsDirty] = useState(false);
 
   const { root, form, fields, inline, title, subtitle, message } = styles;
   return (
     <div className={root}>
-      <Form.Root
-        className={form}
-        action={formAction}
-        onSubmit={() => setIsDirty(false)}
-      >
+      <Form.Root className={form} onSubmit={handleSubmit}>
         <div className={title}>Login</div>
         <div className={subtitle}>Log in to your account.</div>
         <div className={fields}>
@@ -80,22 +100,22 @@ export default function LoginForm({ action }: { action: FormAction }) {
             </Form.Message>
           </Form.Field>
           <div>
-            {state.error && !isDirty && !pending && (
+            {isError && !isDirty && !isPending && (
               <Callout.Root size="1" color="red" role="alert">
                 <Callout.Icon>
                   <CrossCircledIcon />
                 </Callout.Icon>
-                <Callout.Text>{state.error}</Callout.Text>
+                <Callout.Text>{error?.message}</Callout.Text>
               </Callout.Root>
             )}
           </div>
           <div className={inline}>
             <Form.Submit asChild>
               <Button
-                disabled={pending}
-                color={state.error && !isDirty && !pending ? "red" : "blue"}
+                disabled={isPending}
+                color={isError && !isDirty && !isPending ? "red" : "blue"}
               >
-                {pending ? "Logging in..." : "Login"}
+                {isPending ? "Logging in..." : "Login"}
               </Button>
             </Form.Submit>
           </div>

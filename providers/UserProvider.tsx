@@ -2,17 +2,27 @@
 
 import { createContext, useContext } from "react";
 
+import { useQuery } from "@tanstack/react-query";
+
+import { fetchCurrentUser } from "@/lib/modules/users/users.api";
+import { usersKeys } from "@/lib/modules/users/users.keys";
 import { User } from "@/lib/modules/users/users.types";
 
 const UserContext = createContext<User | null>(null);
 
 export function UserProvider({
-  user,
+  initialUser,
   children,
 }: {
-  user: User | null;
+  initialUser: User | null;
   children: React.ReactNode;
 }) {
+  const { data: user } = useQuery({
+    queryKey: usersKeys.current,
+    queryFn: fetchCurrentUser,
+    initialData: initialUser,
+    staleTime: 1000 * 60 * 5,
+  });
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
 }
 

@@ -11,15 +11,8 @@ interface ArticleBlockProps {
 }
 
 export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
-  const {
-    authorUsername,
-    content,
-    imageUrl,
-    createdAt,
-    likedByUser,
-    likeCount,
-    id,
-  } = article;
+  const { author, content, imageUrl, createdAt, likedByUser, likeCount, id } =
+    article;
 
   const date = new Date(createdAt);
   const formatted = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
@@ -30,13 +23,17 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
         <div className={styles.author}>
           <div className={styles.avatarImage}>
             <Image
-              src="https://res.cloudinary.com/dmpiaetro/image/upload/v1776984223/7b66703c-c159-4bb5-b3cb-bef5bc445668.png"
+              src={
+                author?.avatar
+                  ? author.avatar
+                  : "https://res.cloudinary.com/dmpiaetro/image/upload/v1776984223/7b66703c-c159-4bb5-b3cb-bef5bc445668.png"
+              }
               alt="Profile Image"
               fill
               sizes="32px"
             />
           </div>
-          <span className={styles.username}>{authorUsername}</span>
+          <span className={styles.username}>{author?.username}</span>
         </div>
 
         <span className={styles.date}>{formatted}</span>

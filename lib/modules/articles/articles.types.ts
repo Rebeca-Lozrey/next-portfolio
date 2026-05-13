@@ -5,12 +5,15 @@ import { createArticleSchema } from "./articles.schema";
 
 export interface ArticleDocument {
   _id: ObjectId;
-  authorId: string;
-  authorUsername: string;
+  authorId: ObjectId;
   content: string;
   imageUrl: string | null;
   likeCount: number;
   createdAt: Date;
+  author: {
+    username: string;
+    avatar: string | null;
+  };
 }
 
 export type ArticleDocumentWithSort = ArticleDocument & {
@@ -19,16 +22,12 @@ export type ArticleDocumentWithSort = ArticleDocument & {
   meta: { count: { total: number } };
 };
 
-export interface Article {
+type ToArticle<T> = Omit<T, "_id" | "authorId"> & {
   id: string;
-  authorId: string;
-  authorUsername: string;
-  content: string;
-  imageUrl: string | null;
-  likeCount: number;
   likedByUser: boolean;
-  createdAt: Date;
-}
+};
+
+export type Article = ToArticle<ArticleDocument>;
 
 export type Cursor = string | null;
 

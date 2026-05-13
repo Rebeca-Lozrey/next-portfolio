@@ -1,0 +1,30 @@
+.avatarUploadButton {
+  position: relative;
+}
+
+.avatarUploadIcons {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  pointer-events: none;
+}
+
+.imageIcon {
+  width: 100%;
+  height: 100%;
+}
+
+.spinnerIcon {
+  width: 100%;
+  width: 100%;
+}
+.avatarButton {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
