@@ -142,9 +142,7 @@ export const mongoArticlesRepository: ArticlesRepository = {
       text: {
         query: term,
         path: "content",
-        fuzzy: {
-          maxEdits: 2,
-        },
+        matchCriteria: "all",
       },
     };
 

@@ -6,24 +6,32 @@ export async function POST(_: Request) {
   try {
     await clearCurrentUser();
 
-    return NextResponse.json({
-      message: "Logged out",
-      error: null,
-      user: null,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Logged out",
+      },
+      { status: 200 },
+    );
   } catch (error) {
     if (error instanceof Error) {
       console.error(error.message);
-      return {
-        message: null,
-        error: error.message,
-      };
+      return NextResponse.json(
+        {
+          success: false,
+          error: error.message,
+        },
+        { status: 500 },
+      );
     } else {
-      console.error("Unknown error:", error);
-      return {
-        message: null,
-        error: "Something went wrong",
-      };
+      console.error("Unknown error: ", error);
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Something went wrong",
+        },
+        { status: 500 },
+      );
     }
   }
 }

@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  if (term.length > 15) {
+  if (term.length > 40) {
     return NextResponse.json({ error: "Term too long" }, { status: 400 });
   }
 
