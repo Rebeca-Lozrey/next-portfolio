@@ -126,9 +126,13 @@ export async function deleteArticleService(
     const publicId = extractPublicId(deletedArticle.imageUrl);
 
     if (publicId) {
-      await cloudinary.uploader.destroy(publicId, {
-        invalidate: true,
-      });
+      try {
+        await cloudinary.uploader.destroy(publicId, {
+          invalidate: true,
+        });
+      } catch (error) {
+        console.warn("Failed to delete Cloudinary image:", error);
+      }
     }
   }
 }
