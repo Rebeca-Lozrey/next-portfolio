@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 
-import { z } from "zod";
-
+import { ErrorResponse, SuccessResponse } from "@/lib/api/api.types";
+import { handleApiError } from "@/lib/api/handleApiError";
 import { setCurrentUser } from "@/lib/modules/auth/auth.service";
+import { toPublicUser } from "@/lib/modules/users/users.mapper";
 import { mongoUsersRepository } from "@/lib/modules/users/users.repository";
 import { createUserSchema } from "@/lib/modules/users/users.schema";
 import { createUser } from "@/lib/modules/users/users.service";
+import { PublicUser } from "@/lib/modules/users/users.types";
 
 export async function POST(req: Request) {
   try {
@@ -16,43 +18,29 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return NextResponse.json(
         {
+          success: false,
+          error: "Validation failed",
           errors: parsed.error.issues.map((issue) => ({
             field: issue.path.join("."),
             message: issue.message,
           })),
-        },
+        } satisfies ErrorResponse,
         { status: 400 },
       );
     }
 
-    const userId = await createUser(mongoUsersRepository, parsed.data);
+    const user = await createUser(mongoUsersRepository, parsed.data);
 
-    await setCurrentUser(userId);
-
-    return NextResponse.json({
-      message: "Signed up",
-      error: null,
-      user: { ...parsed.data, id: userId },
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        {
-          message: null,
-          error: error.issues.map((i) => i.message).join(", "),
-          user: null,
-        },
-        { status: 400 },
-      );
-    }
+    await setCurrentUser(user.id);
 
     return NextResponse.json(
       {
-        message: null,
-        error: "Something went wrong",
-        user: null,
-      },
-      { status: 500 },
+        success: true,
+        data: toPublicUser(user),
+      } satisfies SuccessResponse<PublicUser>,
+      { status: 201 },
     );
+  } catch (error) {
+    return handleApiError(error, "Signup error: ", "Failed to sign up");
   }
 }

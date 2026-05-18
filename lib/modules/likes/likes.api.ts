@@ -1,7 +1,11 @@
-import type { CreateLikeRequest } from "@/lib/modules/likes/likes.types";
+import { apiFetch } from "@/lib/api/apiFetch";
+import type {
+  CreateLikeRequest,
+  LikeStatus,
+} from "@/lib/modules/likes/likes.types";
 
 export async function createLike({ articleId }: CreateLikeRequest) {
-  const res = await fetch("/api/likes", {
+  const result = await apiFetch<LikeStatus>("/api/likes", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -9,9 +13,5 @@ export async function createLike({ articleId }: CreateLikeRequest) {
     body: JSON.stringify({ articleId }),
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to like article");
-  }
-
-  return res.json();
+  return result.data;
 }

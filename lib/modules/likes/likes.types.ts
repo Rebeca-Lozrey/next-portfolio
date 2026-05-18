@@ -17,4 +17,8 @@ export interface Like {
   createdAt: Date;
 }
 
+export interface LikeStatus {
+  liked: boolean;
+}
+
 export type CreateLikeRequest = z.infer<typeof createLikeSchema>;

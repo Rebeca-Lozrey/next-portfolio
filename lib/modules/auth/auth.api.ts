@@ -1,7 +1,10 @@
+import { apiFetch } from "@/lib/api/apiFetch";
+
+import { PublicUser } from "../users/users.types";
 import { LoginDTO, SignupDTO } from "./auth.types";
 
 export async function login(data: LoginDTO) {
-  const response = await fetch("/api/auth/login", {
+  const result = await apiFetch<PublicUser>("/api/auth/login", {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -9,30 +12,22 @@ export async function login(data: LoginDTO) {
     },
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.error || "Invalid credentials");
-  }
-
-  return result.user;
+  return result.data;
 }
 
 export async function logout() {
-  const response = await fetch("/api/auth/logout", {
+  const result = await apiFetch<null>("/api/auth/logout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
   });
 
-  const result = await response.json();
-
-  return result;
+  return result.data;
 }
 
 export async function signup(data: SignupDTO) {
-  const response = await fetch("/api/auth/signup", {
+  const result = await apiFetch<PublicUser>("/api/auth/signup", {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
@@ -40,7 +35,5 @@ export async function signup(data: SignupDTO) {
     },
   });
 
-  const result = await response.json();
-
-  return result.user;
+  return result.data;
 }

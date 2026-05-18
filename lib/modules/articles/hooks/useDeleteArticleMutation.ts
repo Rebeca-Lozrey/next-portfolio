@@ -55,7 +55,7 @@ export default function useDeleteArticleMutation(term: string | null) {
           context.myArticles,
         );
       }
-      console.error("Failed to delete article");
+      console.error("Failed to delete article: ", _err);
     },
 
     onSettled: (_) => {

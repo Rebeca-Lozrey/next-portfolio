@@ -1,11 +1,15 @@
+import { apiFetch } from "@/lib/api/apiFetch";
 import type {
+  Article,
   ArticlesPage,
   CreateArticleRequest,
   Cursor,
 } from "@/lib/modules/articles/articles.types";
 
-export async function createArticle(payload: CreateArticleRequest) {
-  const res = await fetch("/api/articles", {
+export async function createArticle(
+  payload: CreateArticleRequest,
+): Promise<Article> {
+  const result = await apiFetch<Article>("/api/articles", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -13,11 +17,7 @@ export async function createArticle(payload: CreateArticleRequest) {
     body: JSON.stringify(payload),
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to create article");
-  }
-
-  return res.json();
+  return result.data;
 }
 
 export async function getArticles(cursor: Cursor): Promise<ArticlesPage> {
@@ -29,13 +29,9 @@ export async function getArticles(cursor: Cursor): Promise<ArticlesPage> {
     url = "/api/articles";
   }
 
-  const res = await fetch(url);
+  const result = await apiFetch<ArticlesPage>(url);
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch articles");
-  }
-
-  return res.json();
+  return result.data;
 }
 
 export async function getMyArticles(cursor: Cursor): Promise<ArticlesPage> {
@@ -46,16 +42,12 @@ export async function getMyArticles(cursor: Cursor): Promise<ArticlesPage> {
   } else {
     url = "/api/articles/me";
   }
-  const res = await fetch(url, {
+  const result = await apiFetch<ArticlesPage>(url, {
     method: "GET",
     credentials: "include",
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch my articles");
-  }
-
-  return res.json();
+  return result.data;
 }
 
 export async function getMyArticlesByTerm(
@@ -70,27 +62,19 @@ export async function getMyArticlesByTerm(
 
   const url = `/api/articles/me/search?${params.toString()}`;
 
-  const res = await fetch(url, {
+  const result = await apiFetch<ArticlesPage>(url, {
     method: "GET",
     credentials: "include",
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch my articles");
-  }
-
-  return res.json();
+  return result.data;
 }
 
 export async function deleteArticle(articleId: string) {
-  const res = await fetch(`/api/articles/${articleId}`, {
+  const result = await apiFetch<null>(`/api/articles/${articleId}`, {
     method: "DELETE",
     credentials: "include",
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to delete article");
-  }
-
-  return res.json();
+  return result.data;
 }

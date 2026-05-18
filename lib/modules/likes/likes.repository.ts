@@ -1,6 +1,6 @@
 import { OptionalId } from "mongodb";
 
-import { getCollection } from "@/lib/mongodb";
+import { getCollection } from "@/lib/mongodb/mongodb";
 
 import type { Like, LikeDocument } from "./likes.types";
 

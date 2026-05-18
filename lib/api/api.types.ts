@@ -5,8 +5,7 @@ export type ValidationError = {
 
 export type SuccessResponse<T = undefined> = {
   success: true;
-  message?: string;
-  data?: T;
+  data: T;
 };
 
 export type ErrorResponse = {

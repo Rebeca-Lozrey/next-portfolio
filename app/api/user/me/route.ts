@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/modules/auth/auth.service";
+import { ErrorResponse, SuccessResponse } from "@/lib/api/api.types";
+import { handleApiError } from "@/lib/api/handleApiError";
+import {
+  authenticateUser,
+  getCurrentUser,
+} from "@/lib/modules/auth/auth.service";
+import { toPublicUser } from "@/lib/modules/users/users.mapper";
 import { mongoUsersRepository } from "@/lib/modules/users/users.repository";
 import { updateUserSchema } from "@/lib/modules/users/users.schema";
 import { updateUser } from "@/lib/modules/users/users.service";
+import { PublicUser } from "@/lib/modules/users/users.types";
 
 export async function PATCH(req: Request) {
   try {
@@ -12,29 +19,18 @@ export async function PATCH(req: Request) {
     if (!parsed.success) {
       return NextResponse.json(
         {
+          success: false,
+          error: "Validation failed",
           errors: parsed.error.issues.map((issue) => ({
             field: issue.path.join("."),
             message: issue.message,
           })),
-        },
+        } satisfies ErrorResponse,
         { status: 400 },
       );
     }
 
-    const user = await getCurrentUser();
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          message: null,
-          error: "Unauthorized",
-          user: null,
-        },
-        {
-          status: 401,
-        },
-      );
-    }
+    const user = await authenticateUser();
 
     const updatedUser = await updateUser(
       mongoUsersRepository,
@@ -43,74 +39,30 @@ export async function PATCH(req: Request) {
     );
 
     return NextResponse.json(
-      { message: "User updated", error: null, user: updatedUser },
+      {
+        success: true,
+        data: toPublicUser(updatedUser),
+      } satisfies SuccessResponse<PublicUser>,
       { status: 200 },
     );
   } catch (error) {
-    console.error("Update user error", error);
-    if (error instanceof Error) {
-      return NextResponse.json(
-        {
-          message: null,
-          error: error.message,
-          user: null,
-        },
-        { status: 500 },
-      );
-    } else {
-      return NextResponse.json(
-        {
-          message: null,
-          error: "Unexpected Error",
-          user: null,
-        },
-        { status: 500 },
-      );
-    }
+    return handleApiError(error, "Update user error: ", "Failed updating user");
   }
 }
 
 export async function GET(_: Request) {
   try {
     const user = await getCurrentUser();
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          message: null,
-          error: "Unauthorized",
-          user: null,
-        },
-        {
-          status: 401,
-        },
-      );
-    }
+    const publicUser = user ? toPublicUser(user) : null;
 
     return NextResponse.json(
-      { message: "User retrieved", error: null, user },
+      {
+        success: true,
+        data: publicUser,
+      } satisfies SuccessResponse<PublicUser | null>,
       { status: 200 },
     );
   } catch (error) {
-    console.error("Update user error", error);
-    if (error instanceof Error) {
-      return NextResponse.json(
-        {
-          message: null,
-          error: error.message,
-          user: null,
-        },
-        { status: 500 },
-      );
-    } else {
-      return NextResponse.json(
-        {
-          message: null,
-          error: "Unexpected Error",
-          user: null,
-        },
-        { status: 500 },
-      );
-    }
+    return handleApiError(error, "Fetch user error: ", "Failed to fetch users");
   }
 }

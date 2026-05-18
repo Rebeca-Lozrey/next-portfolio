@@ -1,6 +1,6 @@
 import { ObjectId, OptionalId } from "mongodb";
 
-import { getCollection } from "@/lib/mongodb";
+import { getCollection } from "@/lib/mongodb/mongodb";
 
 import { Session, SessionDocument } from "./sessions.types";
 

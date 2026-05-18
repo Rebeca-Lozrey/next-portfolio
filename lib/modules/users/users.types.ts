@@ -12,6 +12,13 @@ export interface User {
   avatar: string | null;
 }
 
+export interface PublicUser {
+  id: string;
+  email: string;
+  username: string;
+  avatar: string | null;
+}
+
 export interface UserDocument {
   _id: ObjectId;
   email: string;

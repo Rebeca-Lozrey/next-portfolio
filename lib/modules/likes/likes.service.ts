@@ -1,20 +1,16 @@
-import { isDuplicateKeyError } from "@/lib/shared/mongo.utils";
+import { isDuplicateKeyError } from "@/lib/mongodb/mongo.utils";
 
 import { ArticlesRepository } from "../articles/articles.repository";
-import { getCurrentUser } from "../auth/auth.service";
+import { authenticateUser } from "../auth/auth.service";
 import type { LikesRepository } from "./likes.repository";
-import { CreateLikeRequest, Like } from "./likes.types";
+import { CreateLikeRequest, LikeStatus } from "./likes.types";
 
 export async function toggleLike(
   likesRepo: LikesRepository,
   articlesRepo: ArticlesRepository,
   { articleId }: CreateLikeRequest,
-): Promise<{ liked: boolean }> {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    throw new Error("UNAUTHORIZED");
-  }
+): Promise<LikeStatus> {
+  const user = await authenticateUser();
 
   const deleted = await likesRepo.delete(user.id, articleId);
 

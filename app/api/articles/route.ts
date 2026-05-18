@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 
+import { ErrorResponse, SuccessResponse } from "@/lib/api/api.types";
+import { handleApiError } from "@/lib/api/handleApiError";
 import { mongoArticlesRepository } from "@/lib/modules/articles/articles.repository";
 import { createArticleSchema } from "@/lib/modules/articles/articles.schema";
 import {
   createArticleService,
   getArticlesPage,
 } from "@/lib/modules/articles/articles.service";
+import { Article, ArticlesPage } from "@/lib/modules/articles/articles.types";
 import { mongoLikesRepository } from "@/lib/modules/likes/likes.repository";
 
 export async function POST(_req: Request) {
@@ -17,11 +20,13 @@ export async function POST(_req: Request) {
     if (!parsed.success) {
       return NextResponse.json(
         {
+          success: false,
+          error: "Validation failed",
           errors: parsed.error.issues.map((issue) => ({
             field: issue.path.join("."),
             message: issue.message,
           })),
-        },
+        } satisfies ErrorResponse,
         { status: 400 },
       );
     }
@@ -31,13 +36,15 @@ export async function POST(_req: Request) {
       parsed.data,
     );
 
-    return NextResponse.json(article);
-  } catch (error) {
-    console.error("Create article error:", error);
-
     return NextResponse.json(
-      { error: "Failed to create article" },
-      { status: 500 },
+      { success: true, data: article } satisfies SuccessResponse<Article>,
+      { status: 201 },
+    );
+  } catch (error) {
+    return handleApiError(
+      error,
+      "Create article error: ",
+      "Failed to create article",
     );
   }
 }
@@ -52,13 +59,18 @@ export async function GET(_req: Request) {
       mongoLikesRepository,
       cursor,
     );
-    return NextResponse.json(page);
-  } catch (error) {
-    console.error("Fetch articles error:", error);
-
     return NextResponse.json(
-      { error: "Failed to fetch articles" },
-      { status: 500 },
+      {
+        success: true,
+        data: page,
+      } satisfies SuccessResponse<ArticlesPage>,
+      { status: 200 },
+    );
+  } catch (error) {
+    return handleApiError(
+      error,
+      "Fetch articles error: ",
+      "Failed to fetch articles",
     );
   }
 }

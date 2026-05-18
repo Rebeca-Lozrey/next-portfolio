@@ -66,7 +66,7 @@ export default function useLikeArticleMutation(term: string | null) {
           context.myArticles,
         );
       }
-      console.error("Failed to publish article");
+      console.error("Failed to toggle like: ", _err);
     },
 
     onSettled: (_) => {

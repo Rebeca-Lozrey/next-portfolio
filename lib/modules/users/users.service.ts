@@ -1,7 +1,8 @@
+import { ConflictError, NotFoundError } from "@/lib/api/api.errors";
 import {
   getDuplicateField,
   isDuplicateKeyError,
-} from "@/lib/shared/mongo.utils";
+} from "@/lib/mongodb/mongo.utils";
 
 import { mongoArticlesRepository } from "../articles/articles.repository";
 import { hashPassword } from "../auth/password";
@@ -12,15 +13,10 @@ import type { CreateUserInput } from "./users.types";
 export async function createUser(
   repo: UsersRepository,
   input: CreateUserInput,
-): Promise<string> {
-  const existing = await repo.findByEmail(input.email);
-  if (existing) {
-    throw new Error("Email already in use");
-  }
-
+): Promise<User> {
   const passwordHash = await hashPassword(input.password);
 
-  const user: Omit<User, "id"> = {
+  const userInput: Omit<User, "id"> = {
     email: input.email,
     username: input.username,
     passwordHash,
@@ -29,20 +25,22 @@ export async function createUser(
   };
 
   try {
-    return await repo.insert(user);
+    const userid = await repo.insert(userInput);
+
+    return { id: userid, ...userInput };
   } catch (error) {
     if (isDuplicateKeyError(error)) {
       const field = getDuplicateField(error);
 
       if (field === "email") {
-        throw new Error("Email already in use");
+        throw new ConflictError("Email already in use");
       }
 
       if (field === "username") {
-        throw new Error("Username already taken");
+        throw new ConflictError("Username already taken");
       }
 
-      throw new Error("Duplicate value");
+      throw new ConflictError("Duplicate value");
     }
 
     throw error;
@@ -53,14 +51,15 @@ export async function updateUser(
   repo: UsersRepository,
   id: string,
   updates: UpdateUserInput,
-): Promise<User | null> {
+): Promise<User> {
   const updated = await repo.updateById(id, updates);
 
   if (!updated) {
-    throw new Error("Failed to update user");
+    throw new NotFoundError("User not found");
   }
 
   await mongoArticlesRepository.updateByAuthorId(id, updates);
+
   return updated;
 }
 

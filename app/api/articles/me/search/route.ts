@@ -1,27 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { ErrorResponse, SuccessResponse } from "@/lib/api/api.types";
+import { handleApiError } from "@/lib/api/handleApiError";
 import { mongoArticlesRepository } from "@/lib/modules/articles/articles.repository";
 import { getMyArticlesByTermPage } from "@/lib/modules/articles/articles.service";
+import { ArticlesPage } from "@/lib/modules/articles/articles.types";
 import { mongoLikesRepository } from "@/lib/modules/likes/likes.repository";
 
 export async function GET(req: NextRequest) {
-  const termRaw = req.nextUrl.searchParams.get("term");
-  const term = termRaw?.trim();
-
-  if (!term) {
-    return NextResponse.json(
-      { error: "Search term is required" },
-      { status: 400 },
-    );
-  }
-
-  if (term.length > 40) {
-    return NextResponse.json({ error: "Term too long" }, { status: 400 });
-  }
-
-  const cursor = req.nextUrl.searchParams.get("cursor");
-
   try {
+    const termRaw = req.nextUrl.searchParams.get("term");
+    const term = termRaw?.trim();
+
+    if (!term) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Search term is required",
+        } satisfies ErrorResponse,
+        { status: 400 },
+      );
+    }
+
+    if (term.length > 40) {
+      return NextResponse.json(
+        { success: false, error: "Term too long" } satisfies ErrorResponse,
+        { status: 400 },
+      );
+    }
+
+    const cursor = req.nextUrl.searchParams.get("cursor");
+
     const page = await getMyArticlesByTermPage(
       mongoArticlesRepository,
       mongoLikesRepository,
@@ -29,16 +38,15 @@ export async function GET(req: NextRequest) {
       cursor,
     );
 
-    return NextResponse.json(page);
-  } catch (error) {
-    console.error((error as Error).message);
-    if ((error as Error).message === "UNAUTHORIZED") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     return NextResponse.json(
-      { error: "Failed to search user articles" },
-      { status: 500 },
+      { success: true, data: page } satisfies SuccessResponse<ArticlesPage>,
+      { status: 200 },
+    );
+  } catch (error) {
+    return handleApiError(
+      error,
+      "Search user articles error: ",
+      "Failed to search user articles",
     );
   }
 }

@@ -31,6 +31,9 @@ function ArticleFormRaw() {
 
   const uploadMutation = useMutation({
     mutationFn: uploadImage,
+    onError: (_err, _vars) => {
+      console.error("Failed to upload image: ", _err);
+    },
     onSuccess: (url) => {
       setUploaded(url);
     },

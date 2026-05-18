@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import LikeButton from "@/components/LikeButton";
 import type { Article } from "@/lib/modules/articles/articles.types";
+import { useUser } from "@/providers/UserProvider";
 
 import styles from "./ArticleBlock.module.css";
 
@@ -13,6 +14,7 @@ interface ArticleBlockProps {
 export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
   const { author, content, imageUrl, createdAt, likedByUser, likeCount, id } =
     article;
+  const user = useUser();
 
   const date = new Date(createdAt);
   const formatted = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
@@ -57,7 +59,9 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
         <span className={styles.likesCount}>{likeCount} likes</span>
 
         <div className={styles.rightActions}>
-          <LikeButton articleId={id} likedByUser={likedByUser} term={null} />
+          {user && (
+            <LikeButton articleId={id} likedByUser={likedByUser} term={null} />
+          )}
         </div>
       </footer>
     </article>

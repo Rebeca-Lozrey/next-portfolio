@@ -1,6 +1,6 @@
 import { ObjectId, OptionalId } from "mongodb";
 
-import { getCollection } from "@/lib/mongodb";
+import { getCollection } from "@/lib/mongodb/mongodb";
 
 import type { UpdateUserInput, User, UserDocument } from "./users.types";
 

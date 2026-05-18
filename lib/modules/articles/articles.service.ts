@@ -1,9 +1,10 @@
 import { ObjectId } from "mongodb";
 
-import cloudinary from "@/lib/cloudinary";
+import { NotFoundError } from "@/lib/api/api.errors";
+import cloudinary from "@/lib/cloudinary/cloudinary";
 import { extractPublicId } from "@/lib/cloudinary/cloudinary.utils";
 
-import { getCurrentUser } from "../auth/auth.service";
+import { authenticateUser, getCurrentUser } from "../auth/auth.service";
 import { LikesRepository } from "../likes/likes.repository";
 import { type ArticlesRepository } from "./articles.repository";
 import type {
@@ -18,11 +19,7 @@ export async function createArticleService(
   repo: ArticlesRepository,
   input: CreateArticleRequest,
 ): Promise<Article> {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    throw new Error("UNAUTHORIZED");
-  }
+  const user = await authenticateUser();
 
   const article: Omit<ArticleDocument, "_id"> = {
     authorId: new ObjectId(user.id),
@@ -47,11 +44,11 @@ export async function getArticlesPage(
   const rawPage = await articlesRepo.infiniteByCursor(cursor);
 
   let likedSet = new Set<string>();
-
   if (user) {
     const likes = await likesRepo.findByUser(user.id);
     likedSet = new Set(likes.map((l) => l.articleId));
   }
+
   const page: ArticlesPage = {
     articles: rawPage.articles.map((ArticleDocument) => ({
       id: ArticleDocument._id.toString(),
@@ -63,7 +60,7 @@ export async function getArticlesPage(
       content: ArticleDocument.content,
       imageUrl: ArticleDocument.imageUrl,
       likeCount: ArticleDocument.likeCount,
-      likedByUser: likedSet.has(ArticleDocument._id.toString()),
+      likedByUser: user ? likedSet.has(ArticleDocument._id.toString()) : false,
       createdAt: ArticleDocument.createdAt,
     })),
     total: null,
@@ -77,12 +74,7 @@ export async function getMyArticlesPage(
   likesRepo: LikesRepository,
   cursor: Cursor,
 ): Promise<ArticlesPage> {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    throw new Error("UNAUTHORIZED");
-  }
-
+  const user = await authenticateUser();
   const rawPage = await articlesRepo.infiniteByUserCursor(user.id, cursor);
 
   const likes = await likesRepo.findByUser(user.id);
@@ -110,16 +102,11 @@ export async function deleteArticleService(
   repo: ArticlesRepository,
   articleId: string,
 ): Promise<void> {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    throw new Error("UNAUTHORIZED");
-  }
-
+  const user = await authenticateUser();
   const deletedArticle = await repo.deleteByIdAndAuthor(articleId, user.id);
 
   if (!deletedArticle) {
-    throw new Error("NOT_FOUND");
+    throw new NotFoundError("Article not found");
   }
 
   if (deletedArticle.imageUrl) {
@@ -143,12 +130,7 @@ export async function getMyArticlesByTermPage(
   term: string,
   cursor: Cursor,
 ): Promise<ArticlesPage> {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    throw new Error("UNAUTHORIZED");
-  }
-
+  const user = await authenticateUser();
   const rawPage = await articlesRepo.infiniteByUserByTermCursor(
     user.id,
     term,

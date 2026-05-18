@@ -7,7 +7,7 @@ import {
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
 import { Article, ArticlesPage } from "@/lib/modules/articles/articles.types";
 
-import { User } from "../../users/users.types";
+import { PublicUser } from "../../users/users.types";
 import { createArticle } from "../articles.api";
 
 const optimisticUpdate =
@@ -32,7 +32,7 @@ const optimisticUpdate =
   };
 
 export const useCreateArticleMutation = (
-  user: User | null,
+  user: PublicUser | null,
   uploaded: string | undefined,
 ) => {
   const queryClient = useQueryClient();
@@ -89,7 +89,7 @@ export const useCreateArticleMutation = (
           context.myArticles,
         );
       }
-      console.error("Failed to delete article");
+      console.error("Failed to create article: ", _err);
     },
 
     onSettled: () => {

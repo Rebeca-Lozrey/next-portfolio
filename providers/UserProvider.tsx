@@ -6,15 +6,15 @@ import { useQuery } from "@tanstack/react-query";
 
 import { fetchCurrentUser } from "@/lib/modules/users/users.api";
 import { usersKeys } from "@/lib/modules/users/users.keys";
-import { User } from "@/lib/modules/users/users.types";
+import { PublicUser } from "@/lib/modules/users/users.types";
 
-const UserContext = createContext<User | null>(null);
+const UserContext = createContext<PublicUser | null>(null);
 
 export function UserProvider({
   initialUser,
   children,
 }: {
-  initialUser: User | null;
+  initialUser: PublicUser | null;
   children: React.ReactNode;
 }) {
   const { data: user } = useQuery({

@@ -17,7 +17,9 @@ export default function LogoutButton() {
 
   const logoutMutation = useMutation({
     mutationFn: logout,
-
+    onError: (_err, _vars) => {
+      console.error("Failed to logout user: ", _err);
+    },
     onSuccess: () => {
       router.push("/login");
       queryClient.setQueryData(usersKeys.current, null);

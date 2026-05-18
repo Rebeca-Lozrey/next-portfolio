@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 
+import { UnauthorizedError } from "@/lib/api/api.errors";
 import { mongoSessionsRepository } from "@/lib/modules/sessions/sessions.repository";
 import {
   createSession,
@@ -14,15 +15,30 @@ import { SESSION_COOKIE_NAME } from "./auth.constants";
 
 export async function getCurrentUser(): Promise<User | null> {
   const cookieStore = await cookies();
+
   const sessionId = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
-  if (!sessionId) return null;
+  if (!sessionId) {
+    return null;
+  }
 
   const userId = await getUserIdFromSession(mongoSessionsRepository, sessionId);
 
-  if (!userId) return null;
+  if (!userId) {
+    return null;
+  }
 
   return getUserById(mongoUsersRepository, userId);
+}
+
+export async function authenticateUser(): Promise<User> {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    throw new UnauthorizedError("Unauthorized");
+  }
+
+  return user;
 }
 
 export async function setCurrentUser(userId: string): Promise<string> {

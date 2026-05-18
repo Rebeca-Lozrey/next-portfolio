@@ -10,11 +10,11 @@ import { uploadAvatar } from "@/lib/cloudinary/uploadImage";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
 import { updateUser } from "@/lib/modules/users/users.api";
 import { usersKeys } from "@/lib/modules/users/users.keys";
-import { UpdateUserInput, User } from "@/lib/modules/users/users.types";
+import { PublicUser, UpdateUserInput } from "@/lib/modules/users/users.types";
 
 import styles from "./AvatarUploadButton.module.css";
 
-export default function AvatarUploadButton({ user }: { user: User }) {
+export default function AvatarUploadButton({ user }: { user: PublicUser }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const [imageStatus, setImageStatus] = useState<
@@ -27,7 +27,7 @@ export default function AvatarUploadButton({ user }: { user: User }) {
     mutationFn: ({ avatar }: UpdateUserInput) => updateUser({ avatar }),
 
     onError: (_err, _vars) => {
-      console.error("Failed update avatar");
+      console.error("Failed update user avatar: ", _err);
     },
 
     onSettled: () => {
@@ -43,6 +43,9 @@ export default function AvatarUploadButton({ user }: { user: User }) {
 
   const uploadMutation = useMutation({
     mutationFn: uploadAvatar,
+    onError: (_err, _vars) => {
+      console.error("Failed to upload avatar image: ", _err);
+    },
   });
 
   const handleClick = () => {

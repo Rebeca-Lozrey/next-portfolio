@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { SuccessResponse } from "@/lib/api/api.types";
+import { handleApiError } from "@/lib/api/handleApiError";
 import { clearCurrentUser } from "@/lib/modules/auth/auth.service";
 
 export async function POST(_: Request) {
@@ -9,29 +11,11 @@ export async function POST(_: Request) {
     return NextResponse.json(
       {
         success: true,
-        message: "Logged out",
-      },
+        data: null,
+      } satisfies SuccessResponse<null>,
       { status: 200 },
     );
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(error.message);
-      return NextResponse.json(
-        {
-          success: false,
-          error: error.message,
-        },
-        { status: 500 },
-      );
-    } else {
-      console.error("Unknown error: ", error);
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Something went wrong",
-        },
-        { status: 500 },
-      );
-    }
+    return handleApiError(error, "Logout error: ", "Failed to log out");
   }
 }
