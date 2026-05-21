@@ -23,8 +23,8 @@ export default function SignupForm() {
   const queryClient = useQueryClient();
   const submitMutation = useMutation({
     mutationFn: (dto: SignupDTO) => signup(dto),
-    onError: (_err, _vars) => {
-      console.error("Failed to submit user: ", _err);
+    onError: (err, _vars) => {
+      console.error("Failed to submit user: ", err);
     },
     onSuccess: (data) => {
       queryClient.setQueryData(usersKeys.current, data);

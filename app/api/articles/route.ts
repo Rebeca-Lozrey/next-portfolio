@@ -5,15 +5,15 @@ import { handleApiError } from "@/lib/api/handleApiError";
 import { mongoArticlesRepository } from "@/lib/modules/articles/articles.repository";
 import { createArticleSchema } from "@/lib/modules/articles/articles.schema";
 import {
-  createArticleService,
-  getArticlesPage,
+  createArticle,
+  getArticles,
 } from "@/lib/modules/articles/articles.service";
 import { Article, ArticlesPage } from "@/lib/modules/articles/articles.types";
 import { mongoLikesRepository } from "@/lib/modules/likes/likes.repository";
 
-export async function POST(_req: Request) {
+export async function POST(req: Request) {
   try {
-    const body = await _req.json();
+    const body = await req.json();
 
     const parsed = createArticleSchema.safeParse(body);
 
@@ -31,10 +31,7 @@ export async function POST(_req: Request) {
       );
     }
 
-    const article = await createArticleService(
-      mongoArticlesRepository,
-      parsed.data,
-    );
+    const article = await createArticle(mongoArticlesRepository, parsed.data);
 
     return NextResponse.json(
       { success: true, data: article } satisfies SuccessResponse<Article>,
@@ -49,12 +46,12 @@ export async function POST(_req: Request) {
   }
 }
 
-export async function GET(_req: Request) {
+export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(_req.url);
+    const { searchParams } = new URL(req.url);
     const cursor = searchParams.get("cursor");
 
-    const page = await getArticlesPage(
+    const page = await getArticles(
       mongoArticlesRepository,
       mongoLikesRepository,
       cursor,

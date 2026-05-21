@@ -1,7 +1,10 @@
+"use client";
+
 import Image from "next/image";
 
 import DeleteButton from "@/components/DeleteButton";
 import LikeButton from "@/components/LikeButton";
+import ViewArticleButton from "@/components/ViewArticleButton";
 import type { Article } from "@/lib/modules/articles/articles.types";
 
 import styles from "./ArticleBlock.module.css";
@@ -17,7 +20,15 @@ export default function ArticleBlock({
   priority,
   term,
 }: ArticleBlockProps) {
-  const { content, imageUrl, createdAt, likedByUser, likeCount, id } = article;
+  const {
+    content,
+    imageUrl,
+    createdAt,
+    likedByUser,
+    likeCount,
+    commentCount,
+    id,
+  } = article;
 
   return (
     <article className={styles.article}>
@@ -43,8 +54,12 @@ export default function ArticleBlock({
       </div>
 
       <footer className={styles.actions}>
-        <span className={styles.likesCount}>{likeCount} likes</span>
         <div className={styles.rightActions}>
+          <span className={styles.likeCount}>{likeCount} likes</span>
+          <span className={styles.commentCount}>{commentCount} comments</span>
+        </div>
+        <div className={styles.rightActions}>
+          <ViewArticleButton articleId={id} />
           <DeleteButton articleId={id} term={term} />
           <LikeButton articleId={id} likedByUser={likedByUser} term={term} />
         </div>

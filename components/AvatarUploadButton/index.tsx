@@ -26,8 +26,8 @@ export default function AvatarUploadButton({ user }: { user: PublicUser }) {
   const userMutation = useMutation({
     mutationFn: ({ avatar }: UpdateUserInput) => updateUser({ avatar }),
 
-    onError: (_err, _vars) => {
-      console.error("Failed update user avatar: ", _err);
+    onError: (err, _vars) => {
+      console.error("Failed update user avatar: ", err);
     },
 
     onSettled: () => {
@@ -43,8 +43,8 @@ export default function AvatarUploadButton({ user }: { user: PublicUser }) {
 
   const uploadMutation = useMutation({
     mutationFn: uploadAvatar,
-    onError: (_err, _vars) => {
-      console.error("Failed to upload avatar image: ", _err);
+    onError: (err, _vars) => {
+      console.error("Failed to upload avatar image: ", err);
     },
   });
 

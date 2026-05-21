@@ -6,7 +6,7 @@ import type {
   Cursor,
 } from "@/lib/modules/articles/articles.types";
 
-export async function createArticle(
+export async function createArticleRequest(
   payload: CreateArticleRequest,
 ): Promise<Article> {
   const result = await apiFetch<Article>("/api/articles", {
@@ -20,7 +20,9 @@ export async function createArticle(
   return result.data;
 }
 
-export async function getArticles(cursor: Cursor): Promise<ArticlesPage> {
+export async function getArticlesRequest(
+  cursor: Cursor,
+): Promise<ArticlesPage> {
   let url;
   if (cursor) {
     const params = new URLSearchParams({ cursor });
@@ -34,7 +36,9 @@ export async function getArticles(cursor: Cursor): Promise<ArticlesPage> {
   return result.data;
 }
 
-export async function getMyArticles(cursor: Cursor): Promise<ArticlesPage> {
+export async function getMyArticlesRequest(
+  cursor: Cursor,
+): Promise<ArticlesPage> {
   let url;
   if (cursor) {
     const params = new URLSearchParams({ cursor });
@@ -50,7 +54,7 @@ export async function getMyArticles(cursor: Cursor): Promise<ArticlesPage> {
   return result.data;
 }
 
-export async function getMyArticlesByTerm(
+export async function getMyArticlesByTermRequest(
   term: string,
   cursor: Cursor,
 ): Promise<ArticlesPage> {
@@ -70,10 +74,18 @@ export async function getMyArticlesByTerm(
   return result.data;
 }
 
-export async function deleteArticle(articleId: string) {
+export async function deleteArticleRequest(articleId: string) {
   const result = await apiFetch<null>(`/api/articles/${articleId}`, {
     method: "DELETE",
     credentials: "include",
+  });
+
+  return result.data;
+}
+
+export async function getArticleDetailRequest(articleId: string) {
+  const result = await apiFetch<Article>(`/api/articles/${articleId}`, {
+    method: "GET",
   });
 
   return result.data;

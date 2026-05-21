@@ -5,19 +5,21 @@ import { useEffect, useRef } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 
-import { getArticlesRequest } from "@/lib/modules/articles/articles.api";
-import { articlesKeys } from "@/lib/modules/articles/articles.keys";
-import { ArticlesPage, Cursor } from "@/lib/modules/articles/articles.types";
+import { getCommentsRequest } from "@/lib/modules/comments/comments.api";
+import { commentKeys } from "@/lib/modules/comments/comments.keys";
+import { CommentsPage, Cursor } from "@/lib/modules/comments/comments.types";
 
-import EmptyListMessage from "../EmptyListMessage";
-import Fallback from "../Fallback";
-import ArticleBlock from "./ArticleBlock";
-import styles from "./ArticlesList.module.css";
+import EmptyListMessage from "../../EmptyListMessage";
+import Fallback from "../../Fallback";
+import CommentBlock from "./CommentBlock";
+import styles from "./CommentsList.module.css";
 
-export default function ArticlesList({
-  initialPage,
+export default function CommentsList({
+  articleId,
+  initialCommentsPage,
 }: {
-  initialPage: ArticlesPage;
+  articleId: string;
+  initialCommentsPage: CommentsPage;
 }) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const {
@@ -28,13 +30,13 @@ export default function ArticlesList({
     isFetchingNextPage,
     isError,
   } = useInfiniteQuery({
-    queryKey: articlesKeys.all,
-    queryFn: ({ pageParam }: { pageParam: Cursor }) =>
-      getArticlesRequest(pageParam),
+    queryKey: commentKeys.forArticle(articleId),
+    queryFn: ({ pageParam }: { pageParam: Cursor }): Promise<CommentsPage> =>
+      getCommentsRequest(articleId, pageParam),
     initialPageParam: null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialData: {
-      pages: [initialPage],
+      pages: [initialCommentsPage],
       pageParams: [null],
     },
   });
@@ -60,18 +62,12 @@ export default function ArticlesList({
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  const isInitialLoading = isFetching && !data?.pages?.[0]?.articles.length;
-  const hasNoArticles = !isInitialLoading && !data?.pages?.[0]?.articles.length;
+  const isInitialLoading = isFetching && !data?.pages?.[0]?.comments.length;
+  const hasNoComments = !isInitialLoading && !data?.pages?.[0]?.comments.length;
 
   const results = data?.pages.map((page) =>
-    page.articles.map((article, index) => {
-      return (
-        <ArticleBlock
-          key={article.id}
-          article={article}
-          priority={index === 0}
-        />
-      );
+    page.comments.map((comment) => {
+      return <CommentBlock key={comment.id} comment={comment} />;
     }),
   );
 
@@ -79,9 +75,9 @@ export default function ArticlesList({
     <ErrorBoundary FallbackComponent={Fallback}>
       <section className={styles.feed}>
         {isInitialLoading ? (
-          <p>Loading articles...</p>
-        ) : hasNoArticles ? (
-          <EmptyListMessage message="There's no published articles yet." />
+          <p>Loading comments...</p>
+        ) : hasNoComments ? (
+          <EmptyListMessage message="There's no comments yet." />
         ) : (
           results
         )}
@@ -91,7 +87,7 @@ export default function ArticlesList({
         {isFetchingNextPage && <p>Loading more...</p>}
         {isError && !isFetchingNextPage && (
           <div>
-            Failed to load more articles.
+            Failed to load more comments.
             <button onClick={() => fetchNextPage()}>Retry</button>
           </div>
         )}

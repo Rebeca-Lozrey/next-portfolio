@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ErrorResponse, SuccessResponse } from "@/lib/api/api.types";
 import { handleApiError } from "@/lib/api/handleApiError";
 import { mongoArticlesRepository } from "@/lib/modules/articles/articles.repository";
-import { getMyArticlesByTermPage } from "@/lib/modules/articles/articles.service";
+import { searchMyArticlesByTerm } from "@/lib/modules/articles/articles.service";
 import { ArticlesPage } from "@/lib/modules/articles/articles.types";
 import { mongoLikesRepository } from "@/lib/modules/likes/likes.repository";
 
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 
     const cursor = req.nextUrl.searchParams.get("cursor");
 
-    const page = await getMyArticlesByTermPage(
+    const page = await searchMyArticlesByTerm(
       mongoArticlesRepository,
       mongoLikesRepository,
       term,

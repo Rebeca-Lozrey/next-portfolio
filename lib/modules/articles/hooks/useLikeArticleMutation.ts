@@ -56,7 +56,7 @@ export default function useLikeArticleMutation(term: string | null) {
       return snapshot;
     },
 
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       if (context?.all) {
         queryClient.setQueryData(articlesKeys.all, context.all);
       }
@@ -66,7 +66,7 @@ export default function useLikeArticleMutation(term: string | null) {
           context.myArticles,
         );
       }
-      console.error("Failed to toggle like: ", _err);
+      console.error("Failed to toggle like: ", err);
     },
 
     onSettled: (_) => {

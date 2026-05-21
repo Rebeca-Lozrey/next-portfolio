@@ -4,7 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { deleteArticle } from "@/lib/modules/articles/articles.api";
+import { deleteArticleRequest } from "@/lib/modules/articles/articles.api";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
 import { ArticlesPage } from "@/lib/modules/articles/articles.types";
 
@@ -25,7 +25,7 @@ export default function useDeleteArticleMutation(term: string | null) {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: deleteArticle,
+    mutationFn: deleteArticleRequest,
 
     onMutate: async (articleId) => {
       await queryClient.cancelQueries({ queryKey: articlesKeys.all });
@@ -45,7 +45,7 @@ export default function useDeleteArticleMutation(term: string | null) {
       return snapshot;
     },
 
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       if (context?.all) {
         queryClient.setQueryData(articlesKeys.all, context.all);
       }
@@ -55,7 +55,7 @@ export default function useDeleteArticleMutation(term: string | null) {
           context.myArticles,
         );
       }
-      console.error("Failed to delete article: ", _err);
+      console.error("Failed to delete article: ", err);
     },
 
     onSettled: (_) => {

@@ -49,14 +49,28 @@
   margin-top: 8px;
 }
 
-.likesCount {
+/* Likes count (same style as date) */
+.likeCount {
   font-size: 12px;
-  color: var(--gray-10);
+  color: var(--gray-12);
+}
+
+/* Likes count (same style as date) */
+.commentCount {
+  font-size: 12px;
+  color: var(--gray-12);
+}
+
+.leftActions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
 }
 
 .rightActions {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 .divider {

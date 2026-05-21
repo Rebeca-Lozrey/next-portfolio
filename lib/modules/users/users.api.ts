@@ -3,7 +3,7 @@ import { apiFetch } from "@/lib/api/apiFetch";
 import { PublicUser, UpdateUserInput } from "./users.types";
 
 export async function updateUser(updateUserInput: UpdateUserInput) {
-  const result = await apiFetch<PublicUser | null>("/api/user/me", {
+  const result = await apiFetch<PublicUser | null>("/api/users/me", {
     method: "PATCH",
     body: JSON.stringify(updateUserInput),
     headers: {
@@ -15,7 +15,7 @@ export async function updateUser(updateUserInput: UpdateUserInput) {
 }
 
 export async function fetchCurrentUser() {
-  const result = await apiFetch<PublicUser | null>("/api/user/me", {
+  const result = await apiFetch<PublicUser | null>("/api/users/me", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

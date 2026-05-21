@@ -12,7 +12,7 @@ import { usersKeys } from "@/lib/modules/users/users.keys";
 
 import LogoutButton from "./LogoutButton";
 
-function UserMenuRaw() {
+export default function UserMenu() {
   const { data: user, isPending } = useQuery({
     queryKey: usersKeys.current,
     queryFn: () => fetchCurrentUser(),
@@ -21,54 +21,56 @@ function UserMenuRaw() {
   const isAuthenticated = !!user;
 
   return (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger>
-        <IconButton
-          id="user-menu-trigger-top-bar"
-          aria-label="Toggle user menu open or close"
-          color="gray"
-          variant="outline"
-          highContrast
-          size="2"
-        >
-          <PersonIcon />
-        </IconButton>
-      </DropdownMenu.Trigger>
+    <ErrorBoundary FallbackComponent={Fallback}>
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger>
+          <IconButton
+            id="user-menu-trigger-top-bar"
+            aria-label="Toggle user menu open or close"
+            color="gray"
+            variant="outline"
+            highContrast
+            size="2"
+          >
+            <PersonIcon />
+          </IconButton>
+        </DropdownMenu.Trigger>
 
-      <DropdownMenu.Content align="end">
-        {isAuthenticated && !isPending ? (
-          <>
-            <DropdownMenu.Label>
-              <Text size="2">{user.username}</Text>
-            </DropdownMenu.Label>
+        <DropdownMenu.Content align="end">
+          {isAuthenticated && !isPending ? (
+            <>
+              <DropdownMenu.Label>
+                <Text size="2">{user.username}</Text>
+              </DropdownMenu.Label>
 
-            <DropdownMenu.Item asChild>
-              <Link href="/profile">Profile</Link>
-            </DropdownMenu.Item>
+              <DropdownMenu.Item asChild>
+                <Link href="/profile">Profile</Link>
+              </DropdownMenu.Item>
 
-            <DropdownMenu.Item asChild>
-              <Link href="/my-articles">My Articles</Link>
-            </DropdownMenu.Item>
+              <DropdownMenu.Item asChild>
+                <Link href="/my-articles">My Articles</Link>
+              </DropdownMenu.Item>
 
-            <DropdownMenu.Separator />
+              <DropdownMenu.Separator />
 
-            <DropdownMenu.Item asChild>
-              <LogoutButton />
-            </DropdownMenu.Item>
-          </>
-        ) : (
-          <>
-            <DropdownMenu.Item asChild>
-              <Link href="/login">Login</Link>
-            </DropdownMenu.Item>
+              <DropdownMenu.Item asChild>
+                <LogoutButton />
+              </DropdownMenu.Item>
+            </>
+          ) : (
+            <>
+              <DropdownMenu.Item asChild>
+                <Link href="/login">Login</Link>
+              </DropdownMenu.Item>
 
-            <DropdownMenu.Item asChild>
-              <Link href="/signup">Sign Up</Link>
-            </DropdownMenu.Item>
-          </>
-        )}
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+              <DropdownMenu.Item asChild>
+                <Link href="/signup">Sign Up</Link>
+              </DropdownMenu.Item>
+            </>
+          )}
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    </ErrorBoundary>
   );
 }
 
@@ -83,13 +85,5 @@ function Fallback({ error, resetErrorBoundary }: FallbackProps) {
     >
       <PersonIcon />
     </IconButton>
-  );
-}
-
-export default function UserMenu() {
-  return (
-    <ErrorBoundary FallbackComponent={Fallback}>
-      <UserMenuRaw />
-    </ErrorBoundary>
   );
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { ChangeEventHandler } from "react";
 
 import styles from "./Search.module.css";

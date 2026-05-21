@@ -15,7 +15,7 @@ import type {
   Cursor,
 } from "./articles.types";
 
-export async function createArticleService(
+export async function createArticle(
   repo: ArticlesRepository,
   input: CreateArticleRequest,
 ): Promise<Article> {
@@ -27,6 +27,7 @@ export async function createArticleService(
     content: input.content,
     imageUrl: input.imageUrl ?? null,
     likeCount: 0,
+    commentCount: 0,
     createdAt: new Date(),
   };
 
@@ -35,7 +36,7 @@ export async function createArticleService(
   return { ...article, id, likedByUser: false };
 }
 
-export async function getArticlesPage(
+export async function getArticles(
   articlesRepo: ArticlesRepository,
   likesRepo: LikesRepository,
   cursor: Cursor,
@@ -50,18 +51,19 @@ export async function getArticlesPage(
   }
 
   const page: ArticlesPage = {
-    articles: rawPage.articles.map((ArticleDocument) => ({
-      id: ArticleDocument._id.toString(),
-      authorId: ArticleDocument.authorId.toString(),
+    articles: rawPage.articleDocuments.map((doc) => ({
+      id: doc._id.toString(),
+      authorId: doc.authorId.toString(),
       author: {
-        username: ArticleDocument.author.username,
-        avatar: ArticleDocument.author.avatar,
+        username: doc.author.username,
+        avatar: doc.author.avatar,
       },
-      content: ArticleDocument.content,
-      imageUrl: ArticleDocument.imageUrl,
-      likeCount: ArticleDocument.likeCount,
-      likedByUser: user ? likedSet.has(ArticleDocument._id.toString()) : false,
-      createdAt: ArticleDocument.createdAt,
+      content: doc.content,
+      imageUrl: doc.imageUrl,
+      likeCount: doc.likeCount,
+      commentCount: doc.commentCount,
+      likedByUser: likedSet.has(doc._id.toString()),
+      createdAt: doc.createdAt,
     })),
     total: null,
     nextCursor: rawPage.nextCursor,
@@ -69,7 +71,7 @@ export async function getArticlesPage(
   return page;
 }
 
-export async function getMyArticlesPage(
+export async function getMyArticles(
   articlesRepo: ArticlesRepository,
   likesRepo: LikesRepository,
   cursor: Cursor,
@@ -81,13 +83,14 @@ export async function getMyArticlesPage(
   const likedSet = new Set(likes.map((l) => l.articleId));
 
   const page: ArticlesPage = {
-    articles: rawPage.articles.map((doc) => ({
+    articles: rawPage.articleDocuments.map((doc) => ({
       id: doc._id.toString(),
       authorId: doc.authorId.toString(),
       author: { username: doc.author.username, avatar: doc.author.avatar },
       content: doc.content,
       imageUrl: doc.imageUrl,
       likeCount: doc.likeCount,
+      commentCount: doc.commentCount,
       likedByUser: likedSet.has(doc._id.toString()),
       createdAt: doc.createdAt,
     })),
@@ -98,7 +101,7 @@ export async function getMyArticlesPage(
   return page;
 }
 
-export async function deleteArticleService(
+export async function deleteArticle(
   repo: ArticlesRepository,
   articleId: string,
 ): Promise<void> {
@@ -124,7 +127,7 @@ export async function deleteArticleService(
   }
 }
 
-export async function getMyArticlesByTermPage(
+export async function searchMyArticlesByTerm(
   articlesRepo: ArticlesRepository,
   likesRepo: LikesRepository,
   term: string,
@@ -141,13 +144,14 @@ export async function getMyArticlesByTermPage(
   const likedSet = new Set(likes.map((l) => l.articleId));
 
   const page: ArticlesPage = {
-    articles: rawPage.articles.map((doc) => ({
+    articles: rawPage.articleDocuments.map((doc) => ({
       id: doc._id.toString(),
       authorId: doc.authorId.toString(),
       author: { username: doc.author.username, avatar: doc.author.avatar },
       content: doc.content,
       imageUrl: doc.imageUrl,
       likeCount: doc.likeCount,
+      commentCount: doc.commentCount,
       likedByUser: likedSet.has(doc._id.toString()),
       createdAt: doc.createdAt,
     })),
@@ -156,4 +160,35 @@ export async function getMyArticlesByTermPage(
   };
 
   return page;
+}
+
+export async function getArticle(
+  articlesRepo: ArticlesRepository,
+  likesRepo: LikesRepository,
+  articleId: string,
+): Promise<Article | null> {
+  const doc = await articlesRepo.findById(articleId);
+  if (doc === null) {
+    return null;
+  }
+
+  const user = await getCurrentUser();
+
+  let likedSet = new Set<string>();
+  if (user) {
+    const likes = await likesRepo.findByUser(user.id);
+    likedSet = new Set(likes.map((l) => l.articleId));
+  }
+  const article: Article = {
+    id: doc._id.toString(),
+    author: { username: doc.author.username, avatar: doc.author.avatar },
+    content: doc.content,
+    imageUrl: doc.imageUrl,
+    likeCount: doc.likeCount,
+    commentCount: doc.commentCount,
+    likedByUser: likedSet.has(doc._id.toString()),
+    createdAt: doc.createdAt,
+  };
+
+  return article;
 }

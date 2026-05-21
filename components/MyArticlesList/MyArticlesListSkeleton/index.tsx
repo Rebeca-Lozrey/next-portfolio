@@ -1,6 +1,6 @@
 import { Box, Card, Flex, Skeleton } from "@radix-ui/themes";
 
-import styles from "./UserThreadSkeleton.module.css";
+import styles from "./MyArticlesListSkeleton.module.css";
 
 function MyArticleCardSkeleton() {
   return (
@@ -34,7 +34,7 @@ function MyArticleCardSkeleton() {
   );
 }
 
-export default function UserThreadSkeleton() {
+export default function MyArticlesListSkeleton() {
   return (
     <section className={styles.thread} aria-busy="true" aria-live="polite">
       <MyArticleCardSkeleton />

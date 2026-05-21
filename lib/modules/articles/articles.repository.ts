@@ -6,7 +6,7 @@ import { UpdateUserInput } from "../users/users.types";
 import type {
   ArticleDocument,
   ArticleDocumentWithSort,
-  ArticlesDocumentPage,
+  ArticleDocumentsPage,
   Cursor,
 } from "./articles.types";
 
@@ -14,14 +14,13 @@ const COLLECTION_NAME = "articles";
 
 export interface ArticlesRepository {
   insert(article: Omit<ArticleDocument, "_id">): Promise<string>;
-  findById(id: string): Promise<ArticleDocument | null>;
-  infiniteByCursor(cursor: Cursor): Promise<ArticlesDocumentPage>;
+  infiniteByCursor(cursor: Cursor): Promise<ArticleDocumentsPage>;
   decrementLikes(articleId: string): Promise<void>;
   incrementLikes(articleId: string): Promise<void>;
   infiniteByUserCursor(
     authorId: string,
     cursor: Cursor,
-  ): Promise<ArticlesDocumentPage>;
+  ): Promise<ArticleDocumentsPage>;
   deleteByIdAndAuthor(
     id: string,
     authorId: string,
@@ -30,8 +29,11 @@ export interface ArticlesRepository {
     authorId: string,
     term: string,
     cursor: Cursor,
-  ): Promise<ArticlesDocumentPage>;
+  ): Promise<ArticleDocumentsPage>;
   updateByAuthorId(authorId: string, updates: UpdateUserInput): Promise<number>;
+  findById(articleId: string): Promise<ArticleDocument | null>;
+  decrementComments(articleId: string): Promise<void>;
+  incrementComments(articleId: string): Promise<void>;
 }
 
 export const mongoArticlesRepository: ArticlesRepository = {
@@ -40,11 +42,6 @@ export const mongoArticlesRepository: ArticlesRepository = {
       await getCollection<OptionalId<ArticleDocument>>(COLLECTION_NAME);
     const result = await collection.insertOne(article);
     return result.insertedId.toString();
-  },
-
-  async findById(id) {
-    const collection = await getCollection<ArticleDocument>(COLLECTION_NAME);
-    return collection.findOne({ _id: new ObjectId(id) });
   },
 
   async infiniteByCursor(cursor) {
@@ -62,14 +59,14 @@ export const mongoArticlesRepository: ArticlesRepository = {
 
     const hasNextPage = docs.length > LIMIT;
 
-    const articles = hasNextPage ? docs.slice(0, LIMIT) : docs;
+    const articleDocuments = hasNextPage ? docs.slice(0, LIMIT) : docs;
 
     const nextCursor = hasNextPage
-      ? articles[articles.length - 1]._id.toString()
+      ? articleDocuments[articleDocuments.length - 1]._id.toString()
       : null;
 
     return {
-      articles,
+      articleDocuments,
       total: null,
       nextCursor,
     };
@@ -109,17 +106,17 @@ export const mongoArticlesRepository: ArticlesRepository = {
       .toArray();
 
     const hasNextPage = docs.length > LIMIT;
-    const articles = hasNextPage ? docs.slice(0, LIMIT) : docs;
+    const articleDocuments = hasNextPage ? docs.slice(0, LIMIT) : docs;
 
     const total = cursor
       ? null
       : await collection.countDocuments({ authorId: new ObjectId(authorId) });
 
     return {
-      articles,
+      articleDocuments,
       total,
       nextCursor: hasNextPage
-        ? articles[articles.length - 1]._id.toString()
+        ? articleDocuments[articleDocuments.length - 1]._id.toString()
         : null,
     };
   },
@@ -201,15 +198,15 @@ export const mongoArticlesRepository: ArticlesRepository = {
 
     const hasNextPage = docs.length > LIMIT;
 
-    const articles = hasNextPage ? docs.slice(0, LIMIT) : docs;
+    const articleDocuments = hasNextPage ? docs.slice(0, LIMIT) : docs;
 
     return {
-      articles,
-      total: articles.length
-        ? articles[articles.length - 1].meta.count.total
+      articleDocuments,
+      total: articleDocuments.length
+        ? articleDocuments[articleDocuments.length - 1].meta.count.total
         : 0,
       nextCursor: hasNextPage
-        ? articles[articles.length - 1].searchAfter
+        ? articleDocuments[articleDocuments.length - 1].searchAfter
         : null,
     };
   },
@@ -235,5 +232,32 @@ export const mongoArticlesRepository: ArticlesRepository = {
       },
     );
     return result.modifiedCount;
+  },
+
+  async findById(articleId: string) {
+    const collection =
+      await getCollection<OptionalId<ArticleDocument>>(COLLECTION_NAME);
+
+    const result = await collection.findOne({ _id: new ObjectId(articleId) });
+
+    return result;
+  },
+
+  async decrementComments(articleId) {
+    const collection = await getCollection(COLLECTION_NAME);
+
+    await collection.updateOne(
+      { _id: new ObjectId(articleId), commentCount: { $gt: 0 } },
+      { $inc: { commentCount: -1 } },
+    );
+  },
+
+  async incrementComments(articleId) {
+    const collection = await getCollection(COLLECTION_NAME);
+
+    await collection.updateOne(
+      { _id: new ObjectId(articleId) },
+      { $inc: { commentCount: 1 } },
+    );
   },
 };

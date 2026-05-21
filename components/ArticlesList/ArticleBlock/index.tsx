@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 
 import LikeButton from "@/components/LikeButton";
+import ViewArticleButton from "@/components/ViewArticleButton";
 import type { Article } from "@/lib/modules/articles/articles.types";
 import { useUser } from "@/providers/UserProvider";
 
@@ -12,8 +15,16 @@ interface ArticleBlockProps {
 }
 
 export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
-  const { author, content, imageUrl, createdAt, likedByUser, likeCount, id } =
-    article;
+  const {
+    author,
+    content,
+    imageUrl,
+    createdAt,
+    likedByUser,
+    likeCount,
+    commentCount,
+    id,
+  } = article;
   const user = useUser();
 
   const date = new Date(createdAt);
@@ -56,9 +67,12 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
         </div>
       )}
       <footer className={styles.actions}>
-        <span className={styles.likesCount}>{likeCount} likes</span>
-
         <div className={styles.rightActions}>
+          <span className={styles.likeCount}>{likeCount} likes</span>
+          <span className={styles.commentCount}>{commentCount} comments</span>
+        </div>
+        <div className={styles.rightActions}>
+          <ViewArticleButton articleId={id} />
           {user && (
             <LikeButton articleId={id} likedByUser={likedByUser} term={null} />
           )}

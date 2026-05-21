@@ -9,6 +9,7 @@ export interface ArticleDocument {
   content: string;
   imageUrl: string | null;
   likeCount: number;
+  commentCount: number;
   createdAt: Date;
   author: {
     username: string;
@@ -22,17 +23,17 @@ export type ArticleDocumentWithSort = ArticleDocument & {
   meta: { count: { total: number } };
 };
 
-type ToArticle<T> = Omit<T, "_id" | "authorId"> & {
+type Domain<T> = Omit<T, "_id" | "authorId"> & {
   id: string;
   likedByUser: boolean;
 };
 
-export type Article = ToArticle<ArticleDocument>;
+export type Article = Domain<ArticleDocument>;
 
 export type Cursor = string | null;
 
-export interface ArticlesDocumentPage {
-  articles: ArticleDocument[];
+export interface ArticleDocumentsPage {
+  articleDocuments: ArticleDocument[];
   total: number | null;
   nextCursor: Cursor;
 }

@@ -1,6 +1,8 @@
+"use client";
+
 import { SubmitEvent } from "react";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -14,14 +16,20 @@ export default function LogoutButton() {
   const queryClient = useQueryClient();
 
   const router = useRouter();
+  const pathname = usePathname();
+  const protectedRoutes = ["/profile", "/my-articles"];
 
   const logoutMutation = useMutation({
     mutationFn: logout,
-    onError: (_err, _vars) => {
-      console.error("Failed to logout user: ", _err);
+    onError: (err, _vars) => {
+      console.error("Failed to logout user: ", err);
     },
     onSuccess: () => {
-      router.push("/login");
+      if (protectedRoutes.includes(pathname)) {
+        router.push("/login");
+      } else {
+        router.refresh();
+      }
       queryClient.setQueryData(usersKeys.current, null);
       queryClient.removeQueries({
         queryKey: articlesKeys.myArticles(null),

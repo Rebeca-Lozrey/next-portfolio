@@ -8,7 +8,7 @@ import { articlesKeys } from "@/lib/modules/articles/articles.keys";
 import { Article, ArticlesPage } from "@/lib/modules/articles/articles.types";
 
 import { PublicUser } from "../../users/users.types";
-import { createArticle } from "../articles.api";
+import { createArticleRequest } from "../articles.api";
 
 const optimisticUpdate =
   (optimisticArticle: Article) =>
@@ -38,7 +38,7 @@ export const useCreateArticleMutation = (
   const queryClient = useQueryClient();
 
   const createArticleMutation = useMutation({
-    mutationFn: createArticle,
+    mutationFn: createArticleRequest,
 
     onMutate: async (newArticleInput) => {
       if (!user) {
@@ -64,6 +64,7 @@ export const useCreateArticleMutation = (
         imageUrl: uploaded ? uploaded : null,
         createdAt: new Date(),
         likeCount: 0,
+        commentCount: 0,
         likedByUser: false,
       };
 
@@ -79,7 +80,7 @@ export const useCreateArticleMutation = (
       return snapshot;
     },
 
-    onError: (_err, _vars, context) => {
+    onError: (err, _vars, context) => {
       if (context?.all) {
         queryClient.setQueryData(articlesKeys.all, context.all);
       }
@@ -89,7 +90,7 @@ export const useCreateArticleMutation = (
           context.myArticles,
         );
       }
-      console.error("Failed to create article: ", _err);
+      console.error("Failed to create article: ", err);
     },
 
     onSettled: () => {

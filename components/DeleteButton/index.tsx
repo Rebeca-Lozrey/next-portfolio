@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@radix-ui/themes";
 
 import useDeleteArticleMutation from "@/lib/modules/articles/hooks/useDeleteArticleMutation";

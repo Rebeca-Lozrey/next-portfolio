@@ -1,3 +1,5 @@
+"use client";
+
 import { IconButton } from "@radix-ui/themes";
 
 import useLikeArticleMutation from "@/lib/modules/articles/hooks/useLikeArticleMutation";

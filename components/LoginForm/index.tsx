@@ -20,8 +20,8 @@ export default function LoginForm() {
   const router = useRouter();
   const loginMutation = useMutation({
     mutationFn: login,
-    onError: (_err, _vars) => {
-      console.error("Failed to login: ", _err);
+    onError: (err, _vars) => {
+      console.error("Failed to login: ", err);
     },
     onSuccess: (data) => {
       queryClient.setQueryData(usersKeys.current, data);

@@ -1,47 +1,45 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
-import { Avatar, Button, Callout, TextArea } from "@radix-ui/themes";
-import { useMutation } from "@tanstack/react-query";
+import { Button, Callout, TextArea } from "@radix-ui/themes";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 
-import ImageUploadButton from "@/components/ArticleForm/ImageUploadButton";
-import { uploadImage } from "@/lib/cloudinary/uploadImage";
-import { useCreateArticleMutation } from "@/lib/modules/articles/hooks/useCreateArticleMutation";
+import { articlesKeys } from "@/lib/modules/articles/articles.keys";
+import { createCommentRequest } from "@/lib/modules/comments/comments.api";
+import { commentKeys } from "@/lib/modules/comments/comments.keys";
 import { useUser } from "@/providers/UserProvider";
 
-import Fallback from "../Fallback";
-import styles from "./ArticleForm.module.css";
+import Fallback from "../../Fallback";
+import styles from "./CommentForm.module.css";
 
-export default function ArticleForm() {
-  const [uploaded, setUploaded] = useState<string | undefined>(undefined);
-  const [preview, setPreview] = useState<string | null>(null);
+export default function CommentForm({ articleId }: { articleId: string }) {
   const [isDirty, setIsDirty] = useState(false);
   const [value, setValue] = useState("");
   const user = useUser();
 
-  useEffect(() => {
-    if (!uploaded) return;
-
-    const img = new Image();
-    img.src = uploaded;
-  }, [uploaded]);
-
-  const uploadMutation = useMutation({
-    mutationFn: uploadImage,
-    onError: (err, _vars) => {
-      console.error("Failed to upload image: ", err);
-    },
-    onSuccess: (url) => {
-      setUploaded(url);
+  const queryClient = useQueryClient();
+  const createCommentMutation = useMutation({
+    mutationFn: ({
+      articleId,
+      content,
+    }: {
+      articleId: string;
+      content: string;
+    }) => createCommentRequest(articleId, content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: commentKeys.forArticle(articleId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: articlesKeys.all,
+      });
     },
   });
-
-  const createArticleMutation = useCreateArticleMutation(user, uploaded);
-
+  const { isPending, isError, error } = createCommentMutation;
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -50,38 +48,25 @@ export default function ArticleForm() {
     const formData = new FormData(form);
     const content = formData.get("content") as string;
 
-    createArticleMutation.mutate(
+    createCommentMutation.mutate(
       {
         content,
-        imageUrl: uploaded,
+        articleId,
       },
       {
         onSuccess: () => {
           form.reset();
           setValue("");
-          setUploaded(undefined);
-          setPreview(null);
         },
       },
     );
   };
 
-  const { root, form, avatar, fields, inline, textarea } = styles;
+  const { root, form, fields, inline, textarea } = styles;
   return (
     <ErrorBoundary FallbackComponent={Fallback}>
       <section className={root}>
         <Form.Root className={form} onSubmit={handleSubmit}>
-          <div className={avatar}>
-            <div>
-              <Avatar
-                src={user?.avatar ? user?.avatar : undefined}
-                fallback={user?.username?.[0]?.toUpperCase() || "U"}
-                size="4"
-                radius="full"
-                aria-label="Upload avatar image"
-              />
-            </div>
-          </div>
           <div className={fields}>
             <Form.Field name="content">
               <Form.Control asChild>
@@ -107,36 +92,27 @@ export default function ArticleForm() {
             </Form.Field>
 
             <div className={inline}>
-              <ImageUploadButton
-                uploadMutation={uploadMutation}
-                setPreview={setPreview}
-                preview={preview}
-              />
               <div className={styles.rightActions}>
                 <div style={{ color: value.length > 260 ? "red" : "inherit" }}>
                   {value.length}/280
                 </div>
                 <Form.Submit asChild>
                   <Button
-                    disabled={
-                      createArticleMutation.isPending ||
-                      !user ||
-                      uploadMutation.isPending
-                    }
-                    color={createArticleMutation.isError ? "red" : "blue"}
+                    disabled={isPending || !user}
+                    color={isError ? "red" : "blue"}
                   >
-                    {createArticleMutation.isPending ? "Posting..." : "Post"}
+                    {isPending ? "Posting..." : "Post"}
                   </Button>
                 </Form.Submit>
               </div>
             </div>
             <div>
-              {createArticleMutation.isError && createArticleMutation.error && (
+              {isError && error && (
                 <Callout.Root size="1" color="red" role="alert">
                   <Callout.Icon>
                     <CrossCircledIcon />
                   </Callout.Icon>
-                  <Callout.Text>{"Failed to publish article"}</Callout.Text>
+                  <Callout.Text>{"Failed to publish comment"}</Callout.Text>
                 </Callout.Root>
               )}
               {!user && isDirty && (
@@ -145,7 +121,7 @@ export default function ArticleForm() {
                     <CrossCircledIcon />
                   </Callout.Icon>
                   <Callout.Text>
-                    {"Please log in to publish an article."}
+                    {"Please log in to publish a comment."}
                   </Callout.Text>
                 </Callout.Root>
               )}

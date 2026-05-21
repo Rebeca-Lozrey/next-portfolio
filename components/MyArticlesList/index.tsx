@@ -7,8 +7,8 @@ import { ErrorBoundary } from "react-error-boundary";
 
 import useDebounce from "@/hooks/useDebounce";
 import {
-  getMyArticles,
-  getMyArticlesByTerm,
+  getMyArticlesByTermRequest,
+  getMyArticlesRequest,
 } from "@/lib/modules/articles/articles.api";
 import { articlesKeys } from "@/lib/modules/articles/articles.keys";
 import { ArticlesPage, Cursor } from "@/lib/modules/articles/articles.types";
@@ -17,11 +17,15 @@ import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
 import EmptyListMessage from "../EmptyListMessage";
 import Fallback from "../Fallback";
 import ArticleBlock from "./ArticleBlock";
+import styles from "./MyArticlesList.module.css";
+import MyArticlesListSkeleton from "./MyArticlesListSkeleton";
 import Search from "./Search";
-import styles from "./UserThread.module.css";
-import UserThreadSkeleton from "./UserThreadSkeleton";
 
-function UserThreadRaw({ initialPage }: { initialPage: ArticlesPage }) {
+export default function MyArticlesList({
+  initialPage,
+}: {
+  initialPage: ArticlesPage;
+}) {
   const [searchValue, setSearchValue] = useState("");
   const debouncedTerm = useDebounce(searchValue.trim());
   const term = debouncedTerm || null;
@@ -34,12 +38,12 @@ function UserThreadRaw({ initialPage }: { initialPage: ArticlesPage }) {
     isFetchingNextPage,
     isError,
   } = useInfiniteQuery({
-    queryKey: [...articlesKeys.myArticles(term)],
+    queryKey: articlesKeys.myArticles(term),
     queryFn: ({ pageParam }: { pageParam: Cursor }) => {
       if (!term) {
-        return getMyArticles(pageParam);
+        return getMyArticlesRequest(pageParam);
       }
-      return getMyArticlesByTerm(term, pageParam);
+      return getMyArticlesByTermRequest(term, pageParam);
     },
     initialPageParam: null,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
@@ -83,7 +87,7 @@ function UserThreadRaw({ initialPage }: { initialPage: ArticlesPage }) {
     typeof data?.pages[0]?.total === "number" ? data?.pages[0]?.total : null;
 
   return (
-    <>
+    <ErrorBoundary FallbackComponent={Fallback}>
       <Search
         value={searchValue}
         handleChange={(event) => setSearchValue(event?.target.value)}
@@ -96,7 +100,7 @@ function UserThreadRaw({ initialPage }: { initialPage: ArticlesPage }) {
       )}
       <section className={styles.feed}>
         {isInitialLoading ? (
-          <UserThreadSkeleton />
+          <MyArticlesListSkeleton />
         ) : hasNoUserArticles ? (
           <EmptyListMessage message="You haven’t published any articles yet. When you do, they’ll appear here." />
         ) : hasNoResultsForTerm ? (
@@ -115,18 +119,6 @@ function UserThreadRaw({ initialPage }: { initialPage: ArticlesPage }) {
           </div>
         )}
       </section>
-    </>
-  );
-}
-
-export default function UserThread({
-  initialPage,
-}: {
-  initialPage: ArticlesPage;
-}) {
-  return (
-    <ErrorBoundary FallbackComponent={Fallback}>
-      <UserThreadRaw initialPage={initialPage} />
     </ErrorBoundary>
   );
 }
