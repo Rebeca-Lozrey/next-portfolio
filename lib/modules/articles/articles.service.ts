@@ -1,8 +1,7 @@
 import { ObjectId } from "mongodb";
 
 import { NotFoundError } from "@/lib/api/api.errors";
-import cloudinary from "@/lib/cloudinary/cloudinary";
-import { extractPublicId } from "@/lib/cloudinary/cloudinary.utils";
+import { inngest } from "@/lib/inngest/client";
 
 import { authenticateUser, getCurrentUser } from "../auth/auth.service";
 import { LikesRepository } from "../likes/likes.repository";
@@ -113,17 +112,13 @@ export async function deleteArticle(
   }
 
   if (deletedArticle.imageUrl) {
-    const publicId = extractPublicId(deletedArticle.imageUrl);
-
-    if (publicId) {
-      try {
-        await cloudinary.uploader.destroy(publicId, {
-          invalidate: true,
-        });
-      } catch (error) {
-        console.warn("Failed to delete Cloudinary image:", error);
-      }
-    }
+    await inngest.send({
+      name: "article.deleted",
+      data: {
+        imageUrl: deletedArticle.imageUrl,
+        articleId,
+      },
+    });
   }
 }
 

@@ -1,14 +1,32 @@
 import { NextResponse } from "next/server";
 
+import { MongoServerError } from "mongodb";
+
 import { ConflictError, NotFoundError, UnauthorizedError } from "./api.errors";
 import { ErrorResponse } from "./api.types";
 
-export function handleApiError(
+export function handleApiError<T>(
   error: unknown,
   serverMessage: string,
   clientMessage: string,
+  payload?: T,
 ) {
   console.error(serverMessage, error);
+  if (error instanceof MongoServerError) {
+    console.error(
+      "Mongo Error Details:\n",
+      JSON.stringify(
+        {
+          errorResponse: error.errorResponse,
+          message: error.message,
+          errInfo: error.errInfo,
+          payload,
+        },
+        null,
+        2,
+      ),
+    );
+  }
 
   if (error instanceof UnauthorizedError) {
     return NextResponse.json(
