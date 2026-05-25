@@ -105,6 +105,7 @@ export default function AvatarUploadButton({ user }: { user: PublicUser }) {
             size="4"
             radius="full"
             className={styles.avatar}
+            id="user-avatar-icon-for-profile"
           />
         </button>
         <div className={avatarUploadIcons}>

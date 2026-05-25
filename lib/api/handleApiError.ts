@@ -5,11 +5,10 @@ import { MongoServerError } from "mongodb";
 import { ConflictError, NotFoundError, UnauthorizedError } from "./api.errors";
 import { ErrorResponse } from "./api.types";
 
-export function handleApiError<T>(
+export function handleApiError(
   error: unknown,
   serverMessage: string,
   clientMessage: string,
-  payload?: T,
 ) {
   console.error(serverMessage, error);
   if (error instanceof MongoServerError) {
@@ -18,9 +17,6 @@ export function handleApiError<T>(
       JSON.stringify(
         {
           errorResponse: error.errorResponse,
-          message: error.message,
-          errInfo: error.errInfo,
-          payload,
         },
         null,
         2,

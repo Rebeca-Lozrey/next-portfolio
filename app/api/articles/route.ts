@@ -12,37 +12,25 @@ import { Article, ArticlesPage } from "@/lib/modules/articles/articles.types";
 import { mongoLikesRepository } from "@/lib/modules/likes/likes.repository";
 
 export async function POST(req: Request) {
-  let body: unknown;
-
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Invalid JSON body",
-      } satisfies ErrorResponse,
-      { status: 400 },
-    );
-  }
+    const body = await req.json();
 
-  const parsed = createArticleSchema.safeParse(body);
+    const parsed = createArticleSchema.safeParse(body);
 
-  if (!parsed.success) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Validation failed",
-        errors: parsed.error.issues.map((issue) => ({
-          field: issue.path.join("."),
-          message: issue.message,
-        })),
-      } satisfies ErrorResponse,
-      { status: 400 },
-    );
-  }
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Validation failed",
+          errors: parsed.error.issues.map((issue) => ({
+            field: issue.path.join("."),
+            message: issue.message,
+          })),
+        } satisfies ErrorResponse,
+        { status: 400 },
+      );
+    }
 
-  try {
     const article = await createArticle(mongoArticlesRepository, parsed.data);
 
     return NextResponse.json(
@@ -57,7 +45,6 @@ export async function POST(req: Request) {
       error,
       "Create article error:",
       "Failed to create article",
-      parsed.data,
     );
   }
 }

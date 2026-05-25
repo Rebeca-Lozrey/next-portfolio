@@ -79,6 +79,7 @@ export default function ArticleForm() {
                 size="4"
                 radius="full"
                 aria-label="Upload avatar image"
+                id="user-avatar-icon-for-form"
               />
             </div>
           </div>
