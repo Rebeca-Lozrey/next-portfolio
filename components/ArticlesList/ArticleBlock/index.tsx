@@ -39,7 +39,7 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
           <div>
             <Avatar
               src={author?.avatar ? author?.avatar : undefined}
-              fallback={user?.username?.[0]?.toUpperCase() || "U"}
+              fallback={author?.username?.[0]?.toUpperCase() || "U"}
               size="3"
               radius="full"
               aria-label="Upload avatar image"
