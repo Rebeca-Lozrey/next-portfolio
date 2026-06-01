@@ -5,7 +5,11 @@ export async function apiFetch<T>(
   input: RequestInfo,
   init?: RequestInit,
 ): Promise<SuccessResponse<T>> {
-  const response = await fetch(input, init);
+  const isServer = typeof window === "undefined";
+
+  const baseUrl = isServer ? process.env.APP_URL : "";
+
+  const response = await fetch(`${baseUrl}${input}`, init);
 
   let result: ApiResponse<T>;
 

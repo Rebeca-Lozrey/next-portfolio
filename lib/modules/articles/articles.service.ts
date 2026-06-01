@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { NotFoundError } from "@/lib/api/api.errors";
 import { inngest } from "@/lib/inngest/client";
+import { EVENTS } from "@/lib/inngest/events";
 
 import { authenticateUser, getCurrentUser } from "../auth/auth.service";
 import { LikesRepository } from "../likes/likes.repository";
@@ -113,7 +114,7 @@ export async function deleteArticle(
 
   if (deletedArticle.imageUrl) {
     await inngest.send({
-      name: "article.deleted",
+      name: EVENTS.ARTICLE_DELETED,
       data: {
         imageUrl: deletedArticle.imageUrl,
         articleId,

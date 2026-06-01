@@ -8,11 +8,10 @@ import * as Form from "@radix-ui/react-form";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
 import { Callout } from "@radix-ui/themes";
 import { Button, Text, TextField } from "@radix-ui/themes";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { signup } from "@/lib/modules/auth/auth.api";
 import { SignupDTO } from "@/lib/modules/auth/auth.types";
-import { usersKeys } from "@/lib/modules/users/users.keys";
 
 import styles from "./SignupForm.module.css";
 
@@ -20,15 +19,13 @@ export default function SignupForm() {
   const [isDirty, setIsDirty] = useState(false);
 
   const router = useRouter();
-  const queryClient = useQueryClient();
   const submitMutation = useMutation({
     mutationFn: (dto: SignupDTO) => signup(dto),
     onError: (err, _vars) => {
       console.error("Failed to submit user: ", err);
     },
-    onSuccess: (data) => {
-      queryClient.setQueryData(usersKeys.current, data);
-      router.push("/my-articles");
+    onSuccess: (user) => {
+      router.push(`/verify-email?email=${encodeURIComponent(user.email)}`);
     },
   });
 

@@ -74,12 +74,12 @@ export default function ArticleForm() {
           <div className={avatar}>
             <div>
               <Avatar
-                src={user?.avatar ? user?.avatar : undefined}
+                src={user?.avatar || undefined}
                 fallback={user?.username?.[0]?.toUpperCase() || "U"}
                 size="4"
                 radius="full"
-                aria-label="Upload avatar image"
-                id="user-avatar-icon-for-form"
+                aria-hidden="true"
+                id={`article-form-avatar-${user?.username}`}
               />
             </div>
           </div>

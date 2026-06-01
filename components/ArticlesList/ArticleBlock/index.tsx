@@ -42,8 +42,8 @@ export default function ArticleBlock({ article, priority }: ArticleBlockProps) {
               fallback={author?.username?.[0]?.toUpperCase() || "U"}
               size="3"
               radius="full"
-              aria-label="Upload avatar image"
-              id="author-avatar-icon-for-article"
+              aria-hidden="true"
+              id={`article-author-avatar-${id}`}
             />
           </div>
           <span className={styles.username}>{author?.username}</span>

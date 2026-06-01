@@ -1,4 +1,6 @@
 import { ConflictError, NotFoundError } from "@/lib/api/api.errors";
+import { inngest } from "@/lib/inngest/client";
+import { EVENTS } from "@/lib/inngest/events";
 import {
   getDuplicateField,
   isDuplicateKeyError,
@@ -6,6 +8,7 @@ import {
 
 import { mongoArticlesRepository } from "../articles/articles.repository";
 import { hashPassword } from "../auth/password";
+import { createEmailVerification } from "../emailVerification/emailVerification.service";
 import type { UsersRepository } from "./users.repository";
 import type { UpdateUserInput, User } from "./users.types";
 import type { CreateUserInput } from "./users.types";
@@ -25,9 +28,21 @@ export async function createUser(
   };
 
   try {
-    const userid = await repo.insert(userInput);
+    const userId = await repo.insert(userInput);
 
-    return { id: userid, ...userInput };
+    const emailVerification = await createEmailVerification(userId);
+
+    await inngest.send({
+      name: EVENTS.USER_SIGNUP_COMPLETED,
+      data: {
+        email: userInput.email,
+        username: userInput.username,
+        userId: userId,
+        token: emailVerification.token,
+      },
+    });
+
+    return { id: userId, ...userInput };
   } catch (error) {
     if (isDuplicateKeyError(error)) {
       const field = getDuplicateField(error);

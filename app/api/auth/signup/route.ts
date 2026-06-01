@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import { ErrorResponse, SuccessResponse } from "@/lib/api/api.types";
 import { handleApiError } from "@/lib/api/handleApiError";
-import { setCurrentUser } from "@/lib/modules/auth/auth.service";
 import { toPublicUser } from "@/lib/modules/users/users.mapper";
 import { mongoUsersRepository } from "@/lib/modules/users/users.repository";
 import { createUserSchema } from "@/lib/modules/users/users.schema";
@@ -30,8 +29,6 @@ export async function POST(req: Request) {
     }
 
     const user = await createUser(mongoUsersRepository, parsed.data);
-
-    await setCurrentUser(user.id);
 
     return NextResponse.json(
       {

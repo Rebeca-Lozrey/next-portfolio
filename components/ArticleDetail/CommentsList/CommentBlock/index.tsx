@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 import { Avatar } from "@radix-ui/themes";
 
 import { Comment } from "@/lib/modules/comments/comments.types";
@@ -9,7 +7,7 @@ import { Comment } from "@/lib/modules/comments/comments.types";
 import styles from "./CommentBlock.module.css";
 
 export default function CommentBlock({ comment }: { comment: Comment }) {
-  const { author, content, createdAt } = comment;
+  const { author, content, createdAt, id } = comment;
 
   const date = new Date(createdAt);
   const formatted = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
@@ -24,8 +22,8 @@ export default function CommentBlock({ comment }: { comment: Comment }) {
               fallback={author?.username?.[0]?.toUpperCase() || "U"}
               size="3"
               radius="full"
-              aria-label="Upload avatar image"
-              id="author-avatar-icon-for-comment"
+              aria-hidden="true"
+              id={`comment-author-avatar-${id} `}
             />
           </div>
           <span className={styles.username}>{author?.username}</span>

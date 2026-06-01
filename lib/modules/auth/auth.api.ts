@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api/apiFetch";
 
+import { EmailVerification } from "../emailVerification/emailVerification.types";
 import { PublicUser } from "../users/users.types";
 import { LoginDTO, SignupDTO } from "./auth.types";
 
@@ -34,6 +35,17 @@ export async function signup(data: SignupDTO) {
       "Content-Type": "application/json",
     },
   });
+
+  return result.data;
+}
+
+export async function emailVerification(token: string) {
+  const result = await apiFetch<EmailVerification | null>(
+    `/api/auth/verify-email?token=${token}`,
+    {
+      method: "POST",
+    },
+  );
 
   return result.data;
 }

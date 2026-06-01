@@ -2,11 +2,12 @@ import cloudinary from "@/lib/cloudinary/cloudinary";
 import { extractPublicId } from "@/lib/cloudinary/cloudinary.utils";
 
 import { inngest } from "../client";
+import { EVENTS } from "../events";
 
 export const articleDeleted = inngest.createFunction(
   {
     id: "article-deleted",
-    triggers: [{ event: "article.deleted" }],
+    triggers: [{ event: EVENTS.ARTICLE_DELETED }],
   },
   async ({ event, step }) => {
     console.warn("Ingest Event: article-deleted, Data:  ", event.data);
