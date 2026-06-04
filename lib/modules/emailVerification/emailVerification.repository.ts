@@ -1,5 +1,4 @@
-import { DeleteResult, ObjectId, OptionalId } from "mongodb";
-import { id } from "zod/locales";
+import { ObjectId, OptionalId } from "mongodb";
 
 import { getCollection } from "@/lib/mongodb/mongodb";
 

@@ -11,6 +11,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import ThemeButton from "@/components/ThemeButton";
 import UserMenu from "@/components/UserMenu";
 import { getCurrentUser } from "@/lib/modules/auth/auth.service";
+import { ObservabilityProvider } from "@/providers/ObservabilityProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import { UserProvider } from "@/providers/UserProvider";
 
@@ -77,34 +78,36 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider attribute="class">
-          <Theme>
-            <QueryProvider>
-              <UserProvider initialUser={user}>
-                <header className="topbar">
-                  <div className="topbar-inner">
-                    <Link href="/">
-                      <Image
-                        src="/logo.svg"
-                        alt="social logo"
-                        width={72}
-                        height={18}
-                        priority
-                      />
-                    </Link>
+        <ObservabilityProvider>
+          <ThemeProvider attribute="class">
+            <Theme>
+              <QueryProvider>
+                <UserProvider initialUser={user}>
+                  <header className="topbar">
+                    <div className="topbar-inner">
+                      <Link href="/">
+                        <Image
+                          src="/logo.svg"
+                          alt="social logo"
+                          width={72}
+                          height={18}
+                          priority
+                        />
+                      </Link>
 
-                    <nav className="topbar-menu">
-                      <ThemeButton />
-                      <UserMenu />
-                    </nav>
-                  </div>
-                </header>
-                {children}
-                <ReactQueryDevtools initialIsOpen={false} />
-              </UserProvider>
-            </QueryProvider>
-          </Theme>
-        </ThemeProvider>
+                      <nav className="topbar-menu">
+                        <ThemeButton />
+                        <UserMenu />
+                      </nav>
+                    </div>
+                  </header>
+                  {children}
+                  <ReactQueryDevtools initialIsOpen={false} />
+                </UserProvider>
+              </QueryProvider>
+            </Theme>
+          </ThemeProvider>
+        </ObservabilityProvider>
       </body>
     </html>
   );
