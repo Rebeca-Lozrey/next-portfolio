@@ -51,6 +51,10 @@ export default function UserMenu() {
                 <Link href="/my-articles">My Articles</Link>
               </DropdownMenu.Item>
 
+              <DropdownMenu.Item asChild>
+                <Link href="/web-vitals">Web Vitals</Link>
+              </DropdownMenu.Item>
+
               <DropdownMenu.Separator />
 
               <DropdownMenu.Item asChild>

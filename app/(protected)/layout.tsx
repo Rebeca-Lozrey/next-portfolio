@@ -12,11 +12,5 @@ export default async function Layout({
   if (!user) {
     redirect("/login");
   }
-  return (
-    <div className="layout">
-      <aside className="sidebar-left"></aside>
-      <main className="site-content">{children}</main>
-      <aside className="sidebar-right"></aside>
-    </div>
-  );
+  return <>{children}</>;
 }

@@ -1,0 +1,39 @@
+.card {
+  width: 300px;
+
+  padding-inline: 24px;
+  padding-block: 20px;
+
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.title {
+  margin: 0 0 16px;
+
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.stats {
+  display: grid;
+
+  grid-template-columns: max-content 1fr;
+
+  row-gap: 8px;
+  column-gap: 12px;
+
+  margin: 0;
+}
+
+.stats dt {
+  margin: 0;
+
+  font-weight: 500;
+}
+
+.stats dd {
+  margin: 0;
+
+  text-align: right;
+}

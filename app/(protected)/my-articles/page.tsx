@@ -9,5 +9,13 @@ export default async function MyArticles() {
     mongoLikesRepository,
     null,
   );
-  return <MyArticlesList initialPage={initialPage} />;
+  return (
+    <div className="layout">
+      <aside className="sidebar-left"></aside>
+      <main className="site-content">
+        <MyArticlesList initialPage={initialPage} />
+      </main>
+      <aside className="sidebar-right"></aside>
+    </div>
+  );
 }

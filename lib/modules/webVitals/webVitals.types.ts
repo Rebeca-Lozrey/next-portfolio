@@ -34,3 +34,21 @@ export type WebVitalDocument = {
 export type WebVital = Omit<WebVitalDocument, "_id"> & { id: string };
 
 export type CreateWebVitalsInput = z.infer<typeof createWebVitalsSchema>;
+
+export interface WebVitalsSummary {
+  _id: "CLS" | "FCP" | "INP" | "LCP" | "TTFB";
+
+  avgValue: number;
+
+  p75Value: number;
+
+  maxValue: number;
+
+  count: number;
+
+  good: number;
+
+  needsImprovement: number;
+
+  poor: number;
+}

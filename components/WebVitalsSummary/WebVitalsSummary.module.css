@@ -1,0 +1,15 @@
+.cards {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.title {
+  margin: 0;
+}

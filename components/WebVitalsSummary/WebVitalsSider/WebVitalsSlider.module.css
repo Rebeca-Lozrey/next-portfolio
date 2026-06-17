@@ -1,0 +1,8 @@
+.slider {
+  padding: var(--space-2) var(--space-6) var(--space-2) var(--space-6);
+}
+
+.labels {
+  display: flex;
+  justify-content: space-between;
+}

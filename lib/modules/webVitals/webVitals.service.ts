@@ -12,3 +12,12 @@ export async function createWebVital(
   const id = await webVitalRepo.insert(webVitalInput);
   return { ...webVitalInput, id };
 }
+
+export async function getWebVitalsSummary(
+  webVitalRepo: WebVitalsRepository,
+  from: Date,
+  to: Date,
+  url?: string,
+) {
+  return webVitalRepo.getWebVitalsSummary(from, to, url || undefined);
+}
