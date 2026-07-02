@@ -1,0 +1,60 @@
+/* Autocomplete.module.css */
+
+.content {
+  width: var(--radix-popover-trigger-width);
+  max-height: 250px;
+  overflow-y: auto;
+
+  padding: var(--space-1);
+
+  background-color: var(--gray-1);
+  border: 1px solid var(--gray-6);
+  border-radius: var(--radius-3);
+
+  box-shadow: var(--shadow-4);
+}
+
+.empty {
+  padding: var(--space-2) var(--space-3);
+  color: var(--gray-11);
+}
+
+.option {
+  appearance: none;
+
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+
+  padding: var(--space-2) var(--space-3);
+
+  border: none;
+  border-radius: var(--radius-2);
+
+  background: transparent;
+
+  text-align: left;
+  cursor: pointer;
+}
+
+.option:hover,
+.option:focus-visible {
+  background-color: var(--gray-a3);
+  outline: none;
+}
+
+.clearButton {
+  all: unset;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  color: var(--gray-10);
+}
+
+.clearButton:hover {
+  color: var(--gray-12);
+}

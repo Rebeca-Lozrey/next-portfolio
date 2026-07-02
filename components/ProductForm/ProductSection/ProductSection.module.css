@@ -1,0 +1,33 @@
+.section {
+  border: 1px solid var(--gray-6);
+  border-radius: var(--radius-3);
+  background-color: var(--color-panel-solid);
+}
+
+.trigger {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: var(--space-3) var(--space-4);
+
+  background: none;
+  border: none;
+
+  cursor: pointer;
+
+  color: var(--gray-12);
+  font-size: var(--font-size-3);
+  font-weight: var(--font-weight-medium);
+}
+
+.trigger:hover {
+  background-color: var(--gray-2);
+}
+
+.content {
+  border-top: 1px solid var(--gray-6);
+  padding: var(--space-4);
+}

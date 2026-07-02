@@ -1,0 +1,23 @@
+.variantsCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  padding: var(--space-4);
+
+  border: 1px solid var(--gray-6);
+  border-radius: var(--radius-3);
+
+  background-color: var(--gray-2);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.field label {
+  color: var(--gray-11);
+  font-size: var(--font-size-2);
+}
